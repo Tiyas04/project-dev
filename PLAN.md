@@ -15,7 +15,6 @@ The platform aggregates data from multiple coding platforms and transforms raw s
 * Next.js 16
 * TypeScript
 * Tailwind CSS
-* ShadCN UI
 * Framer Motion
 * Recharts
 
@@ -29,7 +28,6 @@ The platform aggregates data from multiple coding platforms and transforms raw s
 ## Database
 
 * MongoDB
-* Mongoose
 
 ## Caching & Jobs
 

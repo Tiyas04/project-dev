@@ -1,26 +1,39 @@
 @import "tailwindcss";
 
+@theme {
+  --color-blueprint-blue: #1E3A8A;
+  --color-blueprint-blue-light: #2563EB;
+  --color-blueprint-bg: #F8FAFC;
+  --color-sketch-black: #171717;
+  --color-paper: #FDFDFD;
+  
+  --font-sketch: var(--font-cabin-sketch);
+  --font-mono: var(--font-space-mono);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: var(--color-paper);
+  --foreground: var(--color-sketch-black);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Dot grid background for blueprint feel */
+  background-image: radial-gradient(circle at 1px 1px, #d4d4d4 1px, transparent 0);
+  background-size: 20px 20px;
 }
+
+/* Custom rough border utilities */
+@layer utilities {
+  .rough-border {
+    border: 2px solid currentColor;
+    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  }
+  
+  .rough-border-blue {
+    border: 2px solid var(--color-blueprint-blue);
+    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  }
+}
+
