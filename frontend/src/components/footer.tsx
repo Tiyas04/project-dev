@@ -51,10 +51,22 @@ export function Footer() {
         {/* Middle: Links */}
         <div className="col-span-1 md:col-span-3 flex flex-col gap-3 font-mono text-sm uppercase tracking-widest text-sketch-black font-bold items-center md:items-start mt-2">
           <h4 className="text-blueprint-blue mb-2 font-sketch text-2xl tracking-wide normal-case">Navigation</h4>
-          <Link href="#features" className="hover:text-blueprint-blue transition-colors hover:translate-x-1 inline-block transform duration-200">Features</Link>
-          <Link href="#about" className="hover:text-blueprint-blue transition-colors hover:translate-x-1 inline-block transform duration-200">About</Link>
-          <Link href="#how-it-works" className="hover:text-blueprint-blue transition-colors hover:translate-x-1 inline-block transform duration-200">How it Works</Link>
-          <Link href="#faqs" className="hover:text-blueprint-blue transition-colors hover:translate-x-1 inline-block transform duration-200">FAQs</Link>
+          <Link href="#features" className="hover:text-blueprint-blue transition-colors relative group w-fit">
+            Features
+            <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-blueprint-blue origin-left scale-x-0 transition-transform group-hover:scale-x-100 rough-border"></span>
+          </Link>
+          <Link href="#about" className="hover:text-blueprint-blue transition-colors relative group w-fit">
+            About
+            <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-blueprint-blue origin-left scale-x-0 transition-transform group-hover:scale-x-100 rough-border"></span>
+          </Link>
+          <Link href="#how-it-works" className="hover:text-blueprint-blue transition-colors relative group w-fit">
+            How it Works
+            <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-blueprint-blue origin-left scale-x-0 transition-transform group-hover:scale-x-100 rough-border"></span>
+          </Link>
+          <Link href="#faqs" className="hover:text-blueprint-blue transition-colors relative group w-fit">
+            FAQs
+            <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-blueprint-blue origin-left scale-x-0 transition-transform group-hover:scale-x-100 rough-border"></span>
+          </Link>
         </div>
 
         {/* Right Side: CTA */}
