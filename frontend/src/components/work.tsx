@@ -20,28 +20,34 @@ export function Work() {
   const steps = [
     {
       num: "1",
-      title: "Connect Profiles",
+      title: "Create Account",
       duration: "Phase 1 - Onboarding",
-      desc: "Link your LeetCode, Codeforces, and GitHub accounts securely.",
+      desc: "Sign up to our plateform using your Email and password.",
     },
     {
       num: "2",
-      title: "Data Aggregation",
-      duration: "Phase 2 - Synchronization",
-      desc: "Our engine syncs your rating, contest history, and solved problems.",
+      title: "Connect Profiles",
+      duration: "Phase 2 - Connecting",
+      desc: "Connect your various coding platform accounts securely.",
     },
     {
       num: "3",
-      title: "Analyze & Train",
-      duration: "Phase 3 - Insights",
-      desc: "Get your personalized Arena Score and AI-driven study plans.",
+      title: "Data Fetching",
+      duration: "Phase 3 - Data Aggregation",
+      desc: "Our engine syncs your rating, contest history, and solved problems.",
     },
     {
       num: "4",
-      title: "Climb Leaderboards",
-      duration: "Phase 4 - Growth",
-      desc: "Compete with friends and the community to improve your rank.",
-    }
+      title: "Analyze & Train",
+      duration: "Phase 4 - AI insights",
+      desc: "Get your personalized Arena Score and AI-driven study plans.",
+    },
+    // {
+    //   num: "5",
+    //   title: "Climb Leaderboards",
+    //   duration: "Phase 5 - Growth",
+    //   desc: "Compete with friends and the community to improve your rank.",
+    // }
   ];
 
   return (

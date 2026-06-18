@@ -87,11 +87,8 @@ export function Navbar() {
 
         {/* Right: Auth Buttons */}
         <div className="hidden md:flex flex-1 justify-end items-center gap-4">
-          <Link href="/login" className="font-mono font-bold text-sketch-black hover:text-blueprint-blue transition-colors">
-            Login
-          </Link>
-          <Link href="/signup" className="px-6 py-2 bg-blueprint-blue text-white font-mono font-bold rough-border-blue hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_#171717]">
-            Sign Up
+          <Link href="/auth" className="px-6 py-2 bg-blueprint-blue text-white font-mono font-bold rough-border-blue hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_#171717]">
+            Get Started
           </Link>
         </div>
 
@@ -145,11 +142,8 @@ export function Navbar() {
               </motion.div>
 
               <motion.div variants={itemVariants} className="mt-12 flex flex-col gap-6">
-                <Link href="/login" onClick={closeMobileMenu} className="w-full text-center py-4 border-2 border-sketch-black font-bold hover:bg-sketch-black hover:text-white transition-colors">
-                  Login
-                </Link>
-                <Link href="/signup" onClick={closeMobileMenu} className="w-full text-center py-4 bg-blueprint-blue text-white font-bold shadow-[6px_6px_0px_#171717] hover:-translate-y-1 transition-transform">
-                  Sign Up
+                <Link href="/auth" onClick={closeMobileMenu} className="w-full text-center py-4 bg-blueprint-blue text-white font-bold shadow-[6px_6px_0px_#171717] hover:-translate-y-1 transition-transform">
+                 Get Started
                 </Link>
               </motion.div>
             </nav>
