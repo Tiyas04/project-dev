@@ -77,8 +77,8 @@ export function Footer() {
           <p className="font-mono text-sm text-sketch-black/70 font-bold mb-2">
             Join the beta and start climbing the leaderboards today.
           </p>
-          <Link href="/signup" className="px-6 py-3 bg-blueprint-blue text-white font-mono font-bold text-sm rough-border-blue hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_#171717]">
-            Get Early Access
+          <Link href="/auth" className="px-6 py-3 bg-blueprint-blue text-white font-mono font-bold text-sm rough-border-blue hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_#171717]">
+            Get Started
           </Link>
         </div>
 

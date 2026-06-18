@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cabin_Sketch, Space_Mono } from "next/font/google";
 import "./globals.css";
+import { Background } from "@/components/background";
 
 const cabinSketch = Cabin_Sketch({
   weight: ["400", "700"],
@@ -29,7 +30,10 @@ export default function RootLayout({
       lang="en"
       className={`${cabinSketch.variable} ${spaceMono.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col font-mono bg-paper">{children}</body>
+      <body className="min-h-full flex flex-col font-mono bg-paper">
+        <Background />
+        {children}
+        </body>
     </html>
   );
 }
