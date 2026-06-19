@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Code2, Flame, Award, CheckCircle2, TrendingUp, Target, Calendar, Plus, X } from "lucide-react";
 
 // Mock Heatmap Data generator (deterministic to avoid hydration errors)
@@ -60,7 +60,7 @@ const getIntensityColor = (intensity: number) => {
 };
 
 // Framer Motion Variants
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -68,7 +68,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
 };
@@ -320,7 +320,7 @@ export default function ProgressPage() {
                     transition={{ type: "spring", stiffness: 300 }}
                     className="flex items-start gap-4 p-4 bg-paper rough-border group cursor-default hover:bg-sketch-black hover:text-white transition-colors duration-300 shadow-[2px_2px_0px_#171717] hover:shadow-[4px_4px_0px_#1E3A8A]"
                   >
-                    <div className="w-12 h-12 flex-shrink-0 bg-white rounded-full flex items-center justify-center rough-border-blue text-blueprint-blue group-hover:text-sketch-black group-hover:bg-white group-hover:border-white transition-all duration-300">
+                    <div className="w-12 h-12 shrink-0 bg-white rounded-full flex items-center justify-center rough-border-blue text-blueprint-blue group-hover:text-sketch-black group-hover:bg-white group-hover:border-white transition-all duration-300">
                       <Award size={24} className="group-hover:scale-110 transition-transform" />
                     </div>
                     <div>
