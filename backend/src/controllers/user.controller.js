@@ -40,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const avatarLocalPath = req.files?.avatar?.[0]?.path;
 
-    let avatarUrl = "";
+    let avatarUrl = "https://cdn-icons-png.flaticon.com/512/5951/5951752.png";
     if (avatarLocalPath) {
         const avatar = await uploadOnCloudinary(avatarLocalPath);
         if (avatar && avatar.url) {
@@ -219,30 +219,34 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path;
+    let avatarUrl = "https://cdn-icons-png.flaticon.com/512/5951/5951752.png";
 
-    if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is missing");
-    }
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-
-    if (!avatar || !avatar.url) {
-        throw new ApiError(400, "Error while uploading avatar on cloudinary");
+    if (avatarLocalPath) {
+        const avatar = await uploadOnCloudinary(avatarLocalPath);
+        
+        if (!avatar || !avatar.url) {
+            throw new ApiError(400, "Error while uploading avatar on cloudinary");
+        }
+        avatarUrl = avatar.url;
     }
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
-                avatar: avatar.url
+                avatar: avatarUrl
             }
         },
         { new: true }
-    ).select("-password");
+    ).select("-password -refreshToken");
+
+    const message = avatarLocalPath 
+        ? "Avatar image updated successfully" 
+        : "Avatar removed, default avatar applied";
 
     return res
         .status(200)
-        .json(new ApiResponse(200, user, "Avatar image updated successfully"));
+        .json(new ApiResponse(200, user, message));
 });
 
 export {

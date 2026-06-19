@@ -4,12 +4,16 @@ import React, { useState } from "react";
 
 export function Signup() {
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ name, email, password });
+    console.log({ name, username, email, password, avatar });
+    alert("Account created successfully (Mock)!");
   };
 
   return (
@@ -23,6 +27,7 @@ export function Signup() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 relative z-20">
+
         <div className="flex flex-col gap-2">
           <label className="font-mono text-sm font-bold text-sketch-black" htmlFor="name">Full Name</label>
           <input
@@ -33,6 +38,19 @@ export function Signup() {
             required
             className="w-full px-4 py-3 bg-paper font-mono text-sm rough-border focus:outline-none focus:ring-2 focus:ring-blueprint-blue/30 transition-shadow placeholder:text-sketch-black/30"
             placeholder="John Doe"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-mono text-sm font-bold text-sketch-black" htmlFor="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className="w-full px-4 py-3 bg-paper font-mono text-sm rough-border focus:outline-none focus:ring-2 focus:ring-blueprint-blue/30 transition-shadow placeholder:text-sketch-black/30"
+            placeholder="johndoe123"
           />
         </div>
 
@@ -60,6 +78,32 @@ export function Signup() {
             className="w-full px-4 py-3 bg-paper font-mono text-sm rough-border focus:outline-none focus:ring-2 focus:ring-blueprint-blue/30 transition-shadow placeholder:text-sketch-black/30"
             placeholder="••••••••"
           />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-mono text-sm font-bold text-sketch-black" htmlFor="avatar">Profile Picture (Optional)</label>
+          <input
+            id="avatar"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                const file = e.target.files[0];
+                setAvatar(file);
+                setAvatarPreview(URL.createObjectURL(file));
+              }
+            }}
+            className="w-full px-4 py-3 bg-paper font-mono text-sm rough-border focus:outline-none focus:ring-2 focus:ring-blueprint-blue/30 transition-shadow file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blueprint-blue file:text-white hover:file:bg-blueprint-blue/90 cursor-pointer"
+          />
+          {avatarPreview && (
+            <div className="mt-3 flex justify-center">
+              <img 
+                src={avatarPreview} 
+                alt="Avatar preview" 
+                className="w-24 h-24 rounded-full object-cover border-2 border-sketch-black shadow-[4px_4px_0px_#171717]" 
+              />
+            </div>
+          )}
         </div>
 
         <button 
