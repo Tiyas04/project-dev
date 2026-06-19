@@ -95,7 +95,6 @@ User
   email
   avatar
   password
-  role
   refreshToken
   createdAt
 }

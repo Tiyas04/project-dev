@@ -114,7 +114,7 @@ export function Hero() {
 
                 {/* CTAs */}
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4 px-4">
-                    <Link href="/signup" className="group relative flex items-center justify-center gap-3 px-8 py-4 bg-blueprint-blue text-white font-bold font-mono text-lg rough-border-blue hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_#171717]">
+                    <Link href="/auth" className="group relative flex items-center justify-center gap-3 px-8 py-4 bg-blueprint-blue text-white font-bold font-mono text-lg rough-border-blue hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_#171717]">
                         <span className="w-4 h-5 bg-white rounded-sm inline-block transform -rotate-12 group-hover:rotate-0 transition-transform"></span>
                         Get Started
                     </Link>

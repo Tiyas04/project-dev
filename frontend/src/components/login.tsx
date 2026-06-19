@@ -7,9 +7,10 @@ export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log({ email, password });
+    alert("Logged in successfully (Mock)!");
   };
 
   return (
@@ -23,6 +24,7 @@ export function Login() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 relative z-20">
+        
         <div className="flex flex-col gap-2">
           <label className="font-mono text-sm font-bold text-sketch-black" htmlFor="email">Email Address</label>
           <input
