@@ -1,21 +1,58 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { User, Mail, Link as LinkIcon, Code2, Camera, Download, QrCode } from "lucide-react";
+import { User, Mail, Link as LinkIcon, Code2, Camera, Download, QrCode, Trash2 } from "lucide-react";
 import { toPng } from "html-to-image";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Profile() {
-  const [name, setName] = useState("John Doe");
-  const [username, setUsername] = useState("johndoe_123");
-  const [email, setEmail] = useState("john@example.com");
+  const { user, updateAvatar } = useAuth();
+  
+  const [name, setName] = useState(user?.name || "");
+  const [username, setUsername] = useState(user?.username || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [issueDate, setIssueDate] = useState("");
+  const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // Set date only on client side to avoid SSR hydration mismatch
     setIssueDate(new Date().toLocaleDateString());
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setUsername(user.username);
+      setEmail(user.email);
+    }
+  }, [user]);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setIsUpdatingAvatar(true);
+      try {
+        await updateAvatar(e.target.files[0]);
+      } catch (err) {
+        console.error("Failed to update avatar", err);
+      } finally {
+        setIsUpdatingAvatar(false);
+      }
+    }
+  };
+
+  const handleDeleteAvatar = async () => {
+    setIsUpdatingAvatar(true);
+    try {
+      await updateAvatar(null);
+    } catch (err) {
+      console.error("Failed to delete avatar", err);
+    } finally {
+      setIsUpdatingAvatar(false);
+    }
+  };
 
   const handleDownloadCard = async () => {
     if (cardRef.current) {
@@ -51,14 +88,26 @@ export default function Profile() {
           <div className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717] flex flex-col items-center">
             <div className="relative group mb-4">
               <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-dashed border-blueprint-blue bg-paper flex items-center justify-center">
-                <img src="https://cdn-icons-png.flaticon.com/512/5951/5951752.png" alt="Avatar" className="w-full h-full object-cover" />
+                <img src={user?.avatar || "https://cdn-icons-png.flaticon.com/512/5951/5951752.png"} alt="Avatar" className="w-full h-full object-cover" />
               </div>
-              <button className="absolute bottom-0 right-0 bg-blueprint-blue text-white p-2 rounded-full hover:scale-110 transition-transform">
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUpdatingAvatar}
+                className="absolute bottom-0 right-0 bg-blueprint-blue text-white p-2 rounded-full hover:scale-110 transition-transform disabled:opacity-50">
                 <Camera size={18} />
               </button>
+              {user?.avatar && user.avatar !== "https://cdn-icons-png.flaticon.com/512/5951/5951752.png" && (
+                <button 
+                  onClick={handleDeleteAvatar}
+                  disabled={isUpdatingAvatar}
+                  className="absolute top-0 right-0 bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform disabled:opacity-50">
+                  <Trash2 size={16} />
+                </button>
+              )}
+              <input type="file" ref={fileInputRef} onChange={handleAvatarChange} className="hidden" accept="image/*" />
             </div>
-            <h2 className="font-mono text-xl font-bold text-sketch-black">{name}</h2>
-            <p className="font-mono text-sm text-sketch-black/60">@{username}</p>
+            <h2 className="font-mono text-xl font-bold text-sketch-black">{name || "Coder"}</h2>
+            <p className="font-mono text-sm text-sketch-black/60">@{username || "user"}</p>
           </div>
 
           <div className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717]">
@@ -186,11 +235,11 @@ export default function Profile() {
                 
                 <div className="flex justify-between items-start mt-2">
                   <div>
-                    <h2 className="font-sketch text-3xl text-sketch-black uppercase leading-none tracking-wide">{name}</h2>
-                    <p className="font-mono text-xs font-bold text-blueprint-blue mt-1">@{username} // ELITE CODER</p>
+                    <h2 className="font-sketch text-3xl text-sketch-black uppercase leading-none tracking-wide">{name || "Coder"}</h2>
+                    <p className="font-mono text-xs font-bold text-blueprint-blue mt-1">@{username || "user"} // ELITE CODER</p>
                   </div>
                   <div className="w-16 h-16 rounded-full border-2 border-dashed border-sketch-black overflow-hidden bg-white shrink-0 shadow-sm">
-                    <img src="https://cdn-icons-png.flaticon.com/512/5951/5951752.png" alt="Avatar" className="w-full h-full object-cover" />
+                    <img src={user?.avatar || "https://cdn-icons-png.flaticon.com/512/5951/5951752.png"} alt="Avatar" className="w-full h-full object-cover" />
                   </div>
                 </div>
 

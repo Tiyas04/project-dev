@@ -16,6 +16,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
         return { accessToken, refreshToken };
     } catch (error) {
+        console.log("Error :", error)
         throw new ApiError(500, "Something went wrong while generating refresh and access token");
     }
 }
@@ -38,11 +39,11 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User with email or username already exists");
     }
 
-    const avatarLocalPath = req.files?.avatar?.[0]?.path;
+    const avatarBuffer = req.files?.avatar?.[0]?.buffer;
 
     let avatarUrl = "https://cdn-icons-png.flaticon.com/512/5951/5951752.png";
-    if (avatarLocalPath) {
-        const avatar = await uploadOnCloudinary(avatarLocalPath);
+    if (avatarBuffer) {
+        const avatar = await uploadOnCloudinary(avatarBuffer);
         if (avatar && avatar.url) {
             avatarUrl = avatar.url;
         }
@@ -64,6 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Something went wrong while registering the user");
     }
 
+    console.log("user created successfully")
     // return res
     return res.status(201).json(
         new ApiResponse(201, createdUser, "User registered successfully")
@@ -105,6 +107,7 @@ const loginUser = asyncHandler(async (req, res) => {
         secure: true
     }
 
+    console.log("user logged in successfully")
     return res
         .status(200)
         .cookie("accessToken", accessToken, options)
@@ -138,6 +141,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         secure: true
     }
 
+    console.log("user logged out successfully")
     return res
         .status(200)
         .clearCookie("accessToken", options)
@@ -184,11 +188,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
                 )
             )
     } catch (error) {
+        console.log("error :",error)
         throw new ApiError(401, error?.message || "Invalid refresh token");
     }
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
+    console.log("user fetched successfully")
     return res
         .status(200)
         .json(new ApiResponse(200, req.user, "User fetched successfully"));
@@ -212,17 +218,18 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         { new: true, runValidators: true }
     ).select("-password");
 
+    console.log("user updated successfully")
     return res
         .status(200)
         .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-    const avatarLocalPath = req.file?.path;
+    const avatarBuffer = req.file?.buffer;
     let avatarUrl = "https://cdn-icons-png.flaticon.com/512/5951/5951752.png";
 
-    if (avatarLocalPath) {
-        const avatar = await uploadOnCloudinary(avatarLocalPath);
+    if (avatarBuffer) {
+        const avatar = await uploadOnCloudinary(avatarBuffer);
         
         if (!avatar || !avatar.url) {
             throw new ApiError(400, "Error while uploading avatar on cloudinary");
@@ -240,10 +247,11 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         { new: true }
     ).select("-password -refreshToken");
 
-    const message = avatarLocalPath 
+    const message = avatarBuffer 
         ? "Avatar image updated successfully" 
         : "Avatar removed, default avatar applied";
 
+        console.log("Avatar updated successfully")
     return res
         .status(200)
         .json(new ApiResponse(200, user, message));

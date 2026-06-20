@@ -3,9 +3,11 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -56,9 +58,9 @@ export function Navbar() {
       <header className="fixed top-0 left-0 w-full py-4 px-6 md:px-12 flex items-center justify-between z-50 bg-white border-b-2 border-sketch-black border-dashed">
         {/* Left: Logo */}
         <div className="flex items-center gap-2 flex-1">
-          <div className="w-10 h-10 bg-blueprint-blue text-white flex items-center justify-center font-sketch text-2xl rough-border-blue transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
+          <Link href="/" className="w-10 h-10 bg-blueprint-blue text-white flex items-center justify-center font-sketch text-2xl rough-border-blue transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
             DA
-          </div>
+          </Link>
         </div>
         
         {/* Middle: Links */}
@@ -87,9 +89,20 @@ export function Navbar() {
 
         {/* Right: Auth Buttons */}
         <div className="hidden md:flex flex-1 justify-end items-center gap-4">
-          <Link href="/auth" className="px-6 py-2 bg-blueprint-blue text-white font-mono font-bold rough-border-blue hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_#171717]">
-            Get Started
-          </Link>
+          {user ? (
+            <>
+              <Link href="/dashboard" className="px-4 py-2 font-mono font-bold text-sketch-black hover:bg-gray-100 transition-colors">
+                Dashboard
+              </Link>
+              <button onClick={() => logout()} className="px-6 py-2 bg-blueprint-blue text-white font-mono font-bold rough-border-blue hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_#171717]">
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link href="/auth" className="px-6 py-2 bg-blueprint-blue text-white font-mono font-bold rough-border-blue hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_#171717]">
+              Get Started
+            </Link>
+          )}
         </div>
 
         {/* Mobile menu button (Animated Hamburger) */}

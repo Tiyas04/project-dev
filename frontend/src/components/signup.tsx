@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export function Signup() {
   const [name, setName] = useState("");
@@ -9,11 +10,31 @@ export function Signup() {
   const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ name, username, email, password, avatar });
-    alert("Account created successfully (Mock)!");
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("username", username);
+      formData.append("email", email);
+      formData.append("password", password);
+      if (avatar) {
+        formData.append("avatar", avatar);
+      }
+
+      await register(formData);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to create account.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,6 +48,12 @@ export function Signup() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 relative z-20">
+        
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded font-mono text-sm">
+            {error}
+          </div>
+        )}
 
         <div className="flex flex-col gap-2">
           <label className="font-mono text-sm font-bold text-sketch-black" htmlFor="name">Full Name</label>
