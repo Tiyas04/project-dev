@@ -1,15 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
-import { User, Mail, Link as LinkIcon, Code2, Camera } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { User, Mail, Link as LinkIcon, Code2, Camera, Download, QrCode } from "lucide-react";
+import { toPng } from "html-to-image";
 
 export default function Profile() {
   const [name, setName] = useState("John Doe");
   const [username, setUsername] = useState("johndoe_123");
   const [email, setEmail] = useState("john@example.com");
+  const [issueDate, setIssueDate] = useState("");
+
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Set date only on client side to avoid SSR hydration mismatch
+    setIssueDate(new Date().toLocaleDateString());
+  }, []);
+
+  const handleDownloadCard = async () => {
+    if (cardRef.current) {
+      try {
+        const dataUrl = await toPng(cardRef.current, { 
+          backgroundColor: "#f8f9fa", // Match bg-paper approximately
+          pixelRatio: 2 // High-res capture
+        });
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = `${username}-coder-card.png`;
+        link.click();
+      } catch (err) {
+        console.error("Failed to generate image:", err);
+      }
+    }
+  };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8">
+    <div className="w-full max-w-4xl mx-auto space-y-8 pb-12">
       <div className="flex items-center gap-4 mb-8">
         <div className="w-12 h-12 bg-blueprint-blue text-white flex items-center justify-center font-sketch text-3xl rough-border-blue transform -rotate-6">
           <User size={28} />
@@ -61,7 +87,7 @@ export default function Profile() {
         </div>
 
         {/* Right Column: Edit Profile Form */}
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 space-y-8">
           <div className="bg-white p-8 rough-border shadow-[4px_4px_0px_#171717]">
             <h3 className="font-mono text-xl font-bold text-sketch-black mb-6 border-b-2 border-dashed border-sketch-black pb-4">
               Account Details
@@ -124,6 +150,67 @@ export default function Profile() {
                 Save Changes
               </button>
             </form>
+          </div>
+
+          {/* ID Card Generator Section */}
+          <div className="bg-white p-8 rough-border shadow-[4px_4px_0px_#171717]">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b-2 border-dashed border-sketch-black pb-4">
+              <div>
+                <h3 className="font-mono text-xl font-bold text-sketch-black flex items-center gap-2">
+                  <Code2 size={24} className="text-blueprint-blue" />
+                  Coder ID Card
+                </h3>
+                <p className="font-mono text-xs text-sketch-black/60 mt-1">Download and share your stats!</p>
+              </div>
+              <button 
+                onClick={handleDownloadCard}
+                className="flex items-center gap-2 px-4 py-2 bg-sketch-black text-white font-mono font-bold rough-border hover:bg-blueprint-blue transition-colors shadow-[2px_2px_0px_#1E3A8A]"
+              >
+                <Download size={18} />
+                Download PNG
+              </button>
+            </div>
+
+            <div className="flex justify-center overflow-x-auto pb-4">
+              {/* The actual ID card element to capture */}
+              <div 
+                ref={cardRef} 
+                className="w-[400px] h-[250px] bg-paper rough-border p-6 flex flex-col justify-between relative overflow-hidden"
+                style={{ 
+                  backgroundImage: "radial-gradient(#ccc 1px, transparent 1px)", 
+                  backgroundSize: "20px 20px" 
+                }}
+              >
+                {/* Decorative top bar */}
+                <div className="absolute top-0 left-0 w-full h-4 bg-blueprint-blue" />
+                
+                <div className="flex justify-between items-start mt-2">
+                  <div>
+                    <h2 className="font-sketch text-3xl text-sketch-black uppercase leading-none tracking-wide">{name}</h2>
+                    <p className="font-mono text-xs font-bold text-blueprint-blue mt-1">@{username} // ELITE CODER</p>
+                  </div>
+                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-sketch-black overflow-hidden bg-white shrink-0 shadow-sm">
+                    <img src="https://cdn-icons-png.flaticon.com/512/5951/5951752.png" alt="Avatar" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 my-4 font-mono">
+                  <div className="bg-white p-2 border-2 border-sketch-black shadow-sm">
+                    <p className="text-[10px] text-sketch-black/60 font-bold uppercase">LeetCode Solved</p>
+                    <p className="text-xl font-bold text-sketch-black">342</p>
+                  </div>
+                  <div className="bg-white p-2 border-2 border-sketch-black shadow-sm">
+                    <p className="text-[10px] text-sketch-black/60 font-bold uppercase">CF Rating</p>
+                    <p className="text-xl font-bold text-blueprint-blue">1450</p>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-end border-t-2 border-sketch-black pt-2">
+                  <p className="font-mono text-[10px] font-bold text-sketch-black/80">ISSUED: {issueDate || "..."}</p>
+                  <QrCode size={32} className="text-sketch-black" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
