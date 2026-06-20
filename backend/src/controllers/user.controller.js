@@ -189,7 +189,15 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             )
     } catch (error) {
         console.log("error :",error)
-        throw new ApiError(401, error?.message || "Invalid refresh token");
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+        return res
+            .status(401)
+            .clearCookie("accessToken", options)
+            .clearCookie("refreshToken", options)
+            .json(new ApiResponse(401, {}, error?.message || "Invalid refresh token"));
     }
 });
 
