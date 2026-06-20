@@ -5,11 +5,13 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { User, LogOut, LayoutDashboard, BarChart2, Menu, X, TrendingUp } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export function LoggedInNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -83,7 +85,7 @@ export function LoggedInNavbar() {
               className="flex items-center gap-2 px-4 py-2 bg-paper text-sketch-black font-mono font-bold rough-border hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_#171717]"
             >
               <div className="w-6 h-6 rounded-full bg-blueprint-blue flex items-center justify-center overflow-hidden">
-                 <img src="https://cdn-icons-png.flaticon.com/512/5951/5951752.png" alt="Avatar" className="w-full h-full object-cover" />
+                 <img src={user?.avatar || "https://cdn-icons-png.flaticon.com/512/5951/5951752.png"} alt="Avatar" className="w-full h-full object-cover" />
               </div>
               <span>Profile</span>
             </button>
@@ -108,8 +110,7 @@ export function LoggedInNavbar() {
                   <button 
                     onClick={() => {
                       setIsDropdownOpen(false);
-                      // TODO: Implement logout logic
-                      window.location.href = "/";
+                      logout();
                     }}
                     className="flex items-center gap-3 px-4 py-2 font-mono text-sm font-bold text-red-600 hover:bg-red-50 transition-colors text-left"
                   >
@@ -175,7 +176,7 @@ export function LoggedInNavbar() {
                 <button 
                   onClick={() => {
                     closeMobileMenu();
-                    window.location.href = "/";
+                    logout();
                   }} 
                   className="w-full flex items-center justify-center gap-3 py-4 bg-red-100 text-red-600 font-bold shadow-[6px_6px_0px_#171717] hover:-translate-y-1 transition-transform border-2 border-red-200 border-dashed"
                 >

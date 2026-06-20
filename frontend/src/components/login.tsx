@@ -2,15 +2,26 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ email, password });
-    alert("Logged in successfully (Mock)!");
+    setError("");
+    setIsLoading(true);
+    try {
+      await login({ email, password });
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to login. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -25,6 +36,12 @@ export function Login() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 relative z-20">
         
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded font-mono text-sm">
+            {error}
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
           <label className="font-mono text-sm font-bold text-sketch-black" htmlFor="email">Email Address</label>
           <input
