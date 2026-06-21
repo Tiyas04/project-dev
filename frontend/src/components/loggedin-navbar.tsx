@@ -84,8 +84,20 @@ export function LoggedInNavbar() {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center gap-2 px-4 py-2 bg-paper text-sketch-black font-mono font-bold rough-border hover:-translate-y-1 transition-transform shadow-[2px_2px_0px_#171717]"
             >
-              <div className="w-6 h-6 rounded-full bg-blueprint-blue flex items-center justify-center overflow-hidden">
-                 <img src={user?.avatar || "https://cdn-icons-png.flaticon.com/512/5951/5951752.png"} alt="Avatar" className="w-full h-full object-cover" />
+              <div className="w-6 h-6 rounded-full bg-blueprint-blue flex items-center justify-center overflow-hidden shrink-0">
+                 {user?.avatar && user.avatar !== "https://cdn-icons-png.flaticon.com/512/5951/5951752.png" ? (
+                  <img 
+                    src={user.avatar.replace("http://", "https://")} 
+                    alt="Avatar" 
+                    className="w-full h-full object-cover" 
+                    crossOrigin="anonymous"
+                  />
+                 ) : (
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white">
+                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                     <circle cx="12" cy="7" r="4" />
+                   </svg>
+                 )}
               </div>
               <span>Profile</span>
             </button>
