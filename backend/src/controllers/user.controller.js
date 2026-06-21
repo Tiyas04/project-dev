@@ -4,6 +4,9 @@ import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/Apiresponse.js";
 import jwt from "jsonwebtoken";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { OAuth2Client } from "google-auth-library";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -104,7 +107,8 @@ const loginUser = asyncHandler(async (req, res) => {
     // send cookie
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax"
     }
 
     console.log("user logged in successfully")
@@ -138,7 +142,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax"
     }
 
     console.log("user logged out successfully")
@@ -171,10 +176,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
         const options = {
             httpOnly: true,
-            secure: true
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax"
         }
 
-        const { accessToken, newRefreshToken } = await generateAccessAndRefreshTokens(user._id);
+        const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshTokens(user._id);
 
         return res
             .status(200)
@@ -191,7 +197,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         console.log("error :",error)
         const options = {
             httpOnly: true,
-            secure: true
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax"
         }
         return res
             .status(401)
@@ -265,6 +272,74 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, user, message));
 });
 
+const googleAuth = asyncHandler(async (req, res) => {
+    const { credential } = req.body;
+
+    if (!credential) {
+        throw new ApiError(400, "Google credential is required");
+    }
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        const { sub: googleId, email, name, picture } = payload;
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Derive username from email (e.g. john.doe@gmail.com -> john.doe)
+            let baseUsername = email.split('@')[0].toLowerCase();
+            let username = baseUsername;
+            let counter = 1;
+
+            // Ensure username uniqueness
+            while (await User.findOne({ username })) {
+                username = `${baseUsername}${counter}`;
+                counter++;
+            }
+
+            user = await User.create({
+                name,
+                email,
+                username,
+                avatar: picture || "https://cdn-icons-png.flaticon.com/512/5951/5951752.png",
+                authProvider: "google",
+                googleId
+            });
+        }
+
+        const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
+
+        const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+        const options = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax"
+        };
+
+        console.log("User account created/loggedin successfully")
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(
+                    200,
+                    { user: loggedInUser, accessToken, refreshToken },
+                    "Google login successful"
+                )
+            );
+    } catch (error) {
+        console.error("Google Auth Error:", error);
+        throw new ApiError(401, "Invalid Google Token");
+    }
+});
+
 export {
     registerUser,
     loginUser,
@@ -272,5 +347,6 @@ export {
     refreshAccessToken,
     getCurrentUser,
     updateAccountDetails,
-    updateUserAvatar
+    updateUserAvatar,
+    googleAuth
 }
