@@ -108,7 +108,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax"
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     }
 
     console.log("user logged in successfully")
@@ -143,7 +143,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax"
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
     }
 
     console.log("user logged out successfully")
@@ -177,7 +177,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         const options = {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax"
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
         }
 
         const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshTokens(user._id);
@@ -198,7 +198,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         const options = {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax"
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
         }
         return res
             .status(401)
@@ -319,7 +319,7 @@ const googleAuth = asyncHandler(async (req, res) => {
         const options = {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax"
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
         };
 
         console.log("User account created/loggedin successfully")

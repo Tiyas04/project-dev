@@ -59,7 +59,8 @@ export default function Profile() {
       try {
         const dataUrl = await toPng(cardRef.current, { 
           backgroundColor: "#f8f9fa", // Match bg-paper approximately
-          pixelRatio: 2 // High-res capture
+          pixelRatio: 2, // High-res capture
+          skipFonts: true // Skip web font embedding to prevent CORS SecurityError from external stylesheets
         });
         const link = document.createElement("a");
         link.href = dataUrl;
@@ -88,7 +89,19 @@ export default function Profile() {
           <div className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717] flex flex-col items-center">
             <div className="relative group mb-4">
               <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-dashed border-blueprint-blue bg-paper flex items-center justify-center">
-                <img src={user?.avatar || "https://cdn-icons-png.flaticon.com/512/5951/5951752.png"} alt="Avatar" className="w-full h-full object-cover" />
+                {user?.avatar && user.avatar !== "https://cdn-icons-png.flaticon.com/512/5951/5951752.png" ? (
+                  <img 
+                    src={user.avatar.replace("http://", "https://")} 
+                    alt="Avatar" 
+                    className="w-full h-full object-cover" 
+                    crossOrigin="anonymous"
+                  />
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16 text-sketch-black/30">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                )}
               </div>
               <button 
                 onClick={() => fileInputRef.current?.click()}
@@ -238,8 +251,20 @@ export default function Profile() {
                     <h2 className="font-sketch text-3xl text-sketch-black uppercase leading-none tracking-wide">{name || "Coder"}</h2>
                     <p className="font-mono text-xs font-bold text-blueprint-blue mt-1">@{username || "user"} // ELITE CODER</p>
                   </div>
-                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-sketch-black overflow-hidden bg-white shrink-0 shadow-sm">
-                    <img src={user?.avatar || "https://cdn-icons-png.flaticon.com/512/5951/5951752.png"} alt="Avatar" className="w-full h-full object-cover" />
+                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-sketch-black overflow-hidden bg-white shrink-0 shadow-sm flex items-center justify-center">
+                    {user?.avatar && user.avatar !== "https://cdn-icons-png.flaticon.com/512/5951/5951752.png" ? (
+                      <img 
+                        src={user.avatar.replace("http://", "https://")} 
+                        alt="Avatar" 
+                        className="w-full h-full object-cover" 
+                        crossOrigin="anonymous"
+                      />
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-sketch-black/30">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    )}
                   </div>
                 </div>
 
