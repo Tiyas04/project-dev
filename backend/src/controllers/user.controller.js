@@ -216,10 +216,26 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    const { name, email } = req.body;
+    const { name, email, username } = req.body;
 
-    if (!name || !email) {
+    if (!name || !email || !username) {
         throw new ApiError(400, "All fields are required");
+    }
+
+    // If username is being changed, check if new username is unique
+    if (username.toLowerCase() !== req.user.username.toLowerCase()) {
+        const existedUser = await User.findOne({ username: username.toLowerCase() });
+        if (existedUser) {
+            throw new ApiError(409, "Username is already taken");
+        }
+    }
+
+    // If email is being changed, check if new email is unique
+    if (email.toLowerCase() !== req.user.email.toLowerCase()) {
+        const existedUser = await User.findOne({ email: email.toLowerCase() });
+        if (existedUser) {
+            throw new ApiError(409, "Email is already registered");
+        }
     }
 
     const user = await User.findByIdAndUpdate(
@@ -227,11 +243,12 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         {
             $set: {
                 name,
-                email: email
+                email: email.toLowerCase(),
+                username: username.toLowerCase()
             }
         },
         { new: true, runValidators: true }
-    ).select("-password");
+    ).select("-password -refreshToken");
 
     console.log("user updated successfully")
     return res

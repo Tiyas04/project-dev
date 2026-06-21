@@ -6,13 +6,17 @@ import { toPng } from "html-to-image";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Profile() {
-  const { user, updateAvatar } = useAuth();
+  const { user, updateAvatar, updateProfile } = useAuth();
   
   const [name, setName] = useState(user?.name || "");
   const [username, setUsername] = useState(user?.username || "");
   const [email, setEmail] = useState(user?.email || "");
   const [issueDate, setIssueDate] = useState("");
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -51,6 +55,23 @@ export default function Profile() {
       console.error("Failed to delete avatar", err);
     } finally {
       setIsUpdatingAvatar(false);
+    }
+  };
+
+  const handleSaveChanges = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setSaveError("");
+    setSaveSuccess(false);
+    try {
+      await updateProfile({ name, email, username });
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 4000);
+    } catch (err: any) {
+      console.error("Failed to save changes", err);
+      setSaveError(err.response?.data?.message || "Failed to update profile details.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -155,7 +176,18 @@ export default function Profile() {
               Account Details
             </h3>
             
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert("Profile updated!"); }}>
+            <form className="space-y-6" onSubmit={handleSaveChanges}>
+              {saveError && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded font-mono text-sm">
+                  {saveError}
+                </div>
+              )}
+              {saveSuccess && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded font-mono text-sm">
+                  Profile details updated successfully!
+                </div>
+              )}
+
               <div className="flex flex-col gap-2">
                 <label className="font-mono text-sm font-bold text-sketch-black" htmlFor="name">Full Name</label>
                 <div className="relative">
@@ -167,6 +199,7 @@ export default function Profile() {
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    required
                     className="w-full pl-10 pr-4 py-3 bg-paper rough-border focus:outline-none focus:border-blueprint-blue font-mono transition-colors"
                   />
                 </div>
@@ -182,11 +215,12 @@ export default function Profile() {
                     type="text" 
                     id="username"
                     value={username}
-                    disabled
-                    className="w-full pl-10 pr-4 py-3 bg-gray-100 rough-border text-sketch-black/60 focus:outline-none font-mono cursor-not-allowed"
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    className="w-full pl-10 pr-4 py-3 bg-paper rough-border focus:outline-none focus:border-blueprint-blue font-mono transition-colors"
                   />
                 </div>
-                <p className="text-xs font-mono text-sketch-black/50">Username cannot be changed.</p>
+                <p className="text-xs font-mono text-sketch-black/50">Username must be unique.</p>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -200,6 +234,7 @@ export default function Profile() {
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                     className="w-full pl-10 pr-4 py-3 bg-paper rough-border focus:outline-none focus:border-blueprint-blue font-mono transition-colors"
                   />
                 </div>
@@ -207,9 +242,10 @@ export default function Profile() {
 
               <button 
                 type="submit" 
-                className="group relative flex items-center justify-center w-full mt-8 px-8 py-4 bg-blueprint-blue text-white font-bold font-mono text-lg rough-border-blue hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_#171717]"
+                disabled={isSaving}
+                className="group relative flex items-center justify-center w-full mt-8 px-8 py-4 bg-blueprint-blue text-white font-bold font-mono text-lg rough-border-blue hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_#171717] disabled:opacity-55 disabled:cursor-not-allowed"
               >
-                Save Changes
+                {isSaving ? "Saving..." : "Save Changes"}
               </button>
             </form>
           </div>

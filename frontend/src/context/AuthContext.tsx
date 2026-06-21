@@ -22,6 +22,7 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
   updateAvatar: (file: File | null) => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
+  updateProfile: (details: { name: string; email: string; username: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -90,8 +91,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(response.data.data);
   };
 
+  const updateProfile = async (details: { name: string; email: string; username: string }) => {
+    const response = await api.patch("/users/update-account", details);
+    // Update local user state
+    setUser(response.data.data);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, updateAvatar, googleLogin }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, updateAvatar, googleLogin, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
