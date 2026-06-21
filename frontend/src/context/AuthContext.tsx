@@ -21,6 +21,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   updateAvatar: (file: File | null) => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,6 +48,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (credentials: any) => {
     const response = await api.post("/users/login", credentials);
+    setUser(response.data.data.user);
+    router.push("/dashboard");
+  };
+
+  const googleLogin = async (credential: string) => {
+    const response = await api.post("/users/google-auth", { credential });
     setUser(response.data.data.user);
     router.push("/dashboard");
   };
@@ -84,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, updateAvatar }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, updateAvatar, googleLogin }}>
       {children}
     </AuthContext.Provider>
   );

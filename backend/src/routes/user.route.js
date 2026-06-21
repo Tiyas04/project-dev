@@ -6,7 +6,8 @@ import {
     refreshAccessToken, 
     getCurrentUser, 
     updateAccountDetails,
-    updateUserAvatar
+    updateUserAvatar,
+    googleAuth
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -23,6 +24,7 @@ router.route("/register").post(
     registerUser
 );
 router.route("/login").post(loginUser);
+router.route("/google-auth").post(googleAuth);
 
 // secured routes
 router.route("/logout").post(verifyJWT, logoutUser);
