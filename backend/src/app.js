@@ -24,6 +24,15 @@ app.use(
 // routes import
 import userRouter from "./routes/user.route.js";
 
+// Keep-alive check endpoint
+app.get("/api/v1/ping", (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "Server is awake and healthy",
+        timestamp: new Date().toISOString()
+    });
+});
+
 // routes declaration
 app.use("/api/v1/users", userRouter);
 
