@@ -11,6 +11,9 @@ export interface User {
   name: string;
   avatar: string;
   coverImage?: string;
+  leetcode?: string;
+  codeforces?: string;
+  github?: string;
 }
 
 interface AuthContextType {
@@ -23,14 +26,49 @@ interface AuthContextType {
   updateAvatar: (file: File | null) => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
   updateProfile: (details: { name: string; email: string; username: string }) => Promise<void>;
+  connectPlatform: (platform: "leetcode" | "codeforces" | "github", username: string) => void;
+  disconnectPlatform: (platform: "leetcode" | "codeforces" | "github") => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const enrichUserWithConnections = (dbUser: User | null): User | null => {
+    if (!dbUser) return null;
+    const storedLeetcode = typeof window !== "undefined" ? localStorage.getItem(`connections_${dbUser._id}_leetcode`) || "" : "";
+    const storedCodeforces = typeof window !== "undefined" ? localStorage.getItem(`connections_${dbUser._id}_codeforces`) || "" : "";
+    const storedGithub = typeof window !== "undefined" ? localStorage.getItem(`connections_${dbUser._id}_github`) || "" : "";
+    return {
+      ...dbUser,
+      leetcode: storedLeetcode,
+      codeforces: storedCodeforces,
+      github: storedGithub,
+    };
+  };
+
+  const setUser = (newUser: User | null) => {
+    setUserState(enrichUserWithConnections(newUser));
+  };
+
+  const connectPlatform = (platform: "leetcode" | "codeforces" | "github", username: string) => {
+    if (!user) return;
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`connections_${user._id}_${platform}`, username);
+    }
+    setUserState((prev) => (prev ? { ...prev, [platform]: username } : null));
+  };
+
+  const disconnectPlatform = (platform: "leetcode" | "codeforces" | "github") => {
+    if (!user) return;
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(`connections_${user._id}_${platform}`);
+    }
+    setUserState((prev) => (prev ? { ...prev, [platform]: "" } : null));
+  };
 
   const checkAuth = async () => {
     try {
@@ -98,7 +136,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, updateAvatar, googleLogin, updateProfile }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        logout,
+        checkAuth,
+        updateAvatar,
+        googleLogin,
+        updateProfile,
+        connectPlatform,
+        disconnectPlatform,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
