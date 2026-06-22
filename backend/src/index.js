@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import connectDB from "./db/connectDB.js";
 import app from "./app.js";
+import { startKeepAlive } from "./utils/keepAlive.js";
 
 dotenv.config({
     path: './.env'
@@ -12,6 +13,7 @@ connectDB()
     .then(() => {
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
+            startKeepAlive();
         });
     })
     .catch((err) => {

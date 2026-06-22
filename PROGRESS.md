@@ -46,6 +46,7 @@ DevArena is an AI-powered Competitive Programming Analytics Platform that helps 
 * Async handler utilities
 * Cloudinary integration
 * Environment configuration management
+* Render keep-alive system (self-pinging routine + `/api/v1/ping` endpoint)
 
 ---
 
@@ -114,6 +115,7 @@ Implemented achievement visualizations:
 * [x] MongoDB Connection
 * [x] Error Handling System
 * [x] Cloudinary Integration
+* [x] Render Keep-Alive / Ping Integration
 
 ### Authentication
 
