@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { User, LogOut, LayoutDashboard, BarChart2, Menu, X, TrendingUp } from "lucide-react";
+import { User, LogOut, LayoutDashboard, BarChart2, Menu, X, TrendingUp, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export function LoggedInNavbar() {
@@ -47,6 +47,7 @@ export function LoggedInNavbar() {
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
     { name: "Progress", path: "/progress", icon: <TrendingUp size={18} /> },
     { name: "Stats", path: "/stats", icon: <BarChart2 size={18} /> },
+    { name: "Analysis", path: "/analysis", icon: <Zap size={18} /> },
   ];
 
   return (
@@ -178,7 +179,7 @@ export function LoggedInNavbar() {
                   onClick={closeMobileMenu} 
                   className={`w-fit border-b-2 pb-1 flex items-center gap-4 ${pathname === "/profile" ? "text-blueprint-blue border-blueprint-blue" : "hover:text-blueprint-blue border-transparent hover:border-blueprint-blue"}`}
                 >
-                  <span className="text-blueprint-blue/40 text-sm">03</span> 
+                  <span className="text-blueprint-blue/40 text-sm">05</span> 
                   <User size={24} />
                   Profile
                 </Link>

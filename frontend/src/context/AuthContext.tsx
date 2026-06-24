@@ -14,6 +14,32 @@ export interface User {
   leetcode?: string;
   codeforces?: string;
   github?: string;
+  stats?: {
+    leetcode?: {
+      problemsSolved?: number;
+      currentRating?: number;
+      bestRating?: number;
+      globalRanking?: string;
+      contests?: number;
+      maxStreak?: number;
+    } | null;
+    codeforces?: {
+      problemsSolved?: number;
+      currentRating?: number;
+      bestRating?: number;
+      globalRanking?: string;
+      contests?: number;
+      maxStreak?: number;
+    } | null;
+    github?: {
+      publicRepos?: number;
+      contributions?: number;
+      currentStreak?: number;
+      followers?: number;
+      starsReceived?: number;
+      pullRequests?: number;
+    } | null;
+  };
 }
 
 interface AuthContextType {
@@ -26,8 +52,9 @@ interface AuthContextType {
   updateAvatar: (file: File | null) => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
   updateProfile: (details: { name: string; email: string; username: string }) => Promise<void>;
-  connectPlatform: (platform: "leetcode" | "codeforces" | "github", username: string) => void;
-  disconnectPlatform: (platform: "leetcode" | "codeforces" | "github") => void;
+  connectPlatform: (platform: "leetcode" | "codeforces" | "github", username: string) => Promise<void>;
+  disconnectPlatform: (platform: "leetcode" | "codeforces" | "github") => Promise<void>;
+  syncUserStats: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,37 +64,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const enrichUserWithConnections = (dbUser: User | null): User | null => {
-    if (!dbUser) return null;
-    const storedLeetcode = typeof window !== "undefined" ? localStorage.getItem(`connections_${dbUser._id}_leetcode`) || "" : "";
-    const storedCodeforces = typeof window !== "undefined" ? localStorage.getItem(`connections_${dbUser._id}_codeforces`) || "" : "";
-    const storedGithub = typeof window !== "undefined" ? localStorage.getItem(`connections_${dbUser._id}_github`) || "" : "";
-    return {
-      ...dbUser,
-      leetcode: storedLeetcode,
-      codeforces: storedCodeforces,
-      github: storedGithub,
-    };
-  };
-
   const setUser = (newUser: User | null) => {
-    setUserState(enrichUserWithConnections(newUser));
+    setUserState(newUser);
   };
 
-  const connectPlatform = (platform: "leetcode" | "codeforces" | "github", username: string) => {
+  const connectPlatform = async (platform: "leetcode" | "codeforces" | "github", username: string) => {
     if (!user) return;
-    if (typeof window !== "undefined") {
-      localStorage.setItem(`connections_${user._id}_${platform}`, username);
-    }
-    setUserState((prev) => (prev ? { ...prev, [platform]: username } : null));
+    const response = await api.post("/accounts/connect", { platform, username });
+    setUser(response.data.data);
   };
 
-  const disconnectPlatform = (platform: "leetcode" | "codeforces" | "github") => {
+  const disconnectPlatform = async (platform: "leetcode" | "codeforces" | "github") => {
     if (!user) return;
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(`connections_${user._id}_${platform}`);
-    }
-    setUserState((prev) => (prev ? { ...prev, [platform]: "" } : null));
+    const response = await api.post("/accounts/disconnect", { platform });
+    setUser(response.data.data);
+  };
+
+  const syncUserStats = async () => {
+    if (!user) return;
+    const response = await api.post("/accounts/sync");
+    setUser(response.data.data);
   };
 
   const checkAuth = async () => {
@@ -149,6 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         updateProfile,
         connectPlatform,
         disconnectPlatform,
+        syncUserStats,
       }}
     >
       {children}

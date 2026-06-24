@@ -23,6 +23,7 @@ app.use(
 
 // routes import
 import userRouter from "./routes/user.route.js";
+import connectedAccountRouter from "./routes/connectedAccount.route.js";
 
 // Keep-alive check endpoint
 app.get("/api/v1/ping", (req, res) => {
@@ -35,5 +36,6 @@ app.get("/api/v1/ping", (req, res) => {
 
 // routes declaration
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/accounts", connectedAccountRouter);
 
 export default app;

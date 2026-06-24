@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/Apiresponse.js";
 import jwt from "jsonwebtoken";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { OAuth2Client } from "google-auth-library";
+import { enrichUser } from "../utils/userEnricher.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -61,12 +62,11 @@ const registerUser = asyncHandler(async (req, res) => {
         username: username.toLowerCase()
     })
 
-    // remove password and refresh token field from response
-    const createdUser = await User.findById(user._id).select("-password -refreshToken");
-
-    if (!createdUser) {
+    const dbUser = await User.findById(user._id);
+    if (!dbUser) {
         throw new ApiError(500, "Something went wrong while registering the user");
     }
+    const createdUser = await enrichUser(dbUser);
 
     console.log("user created successfully")
     // return res
@@ -102,7 +102,8 @@ const loginUser = asyncHandler(async (req, res) => {
     // access and refresh token
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
 
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+    const dbUser = await User.findById(user._id);
+    const loggedInUser = await enrichUser(dbUser);
 
     // send cookie
     const options = {
@@ -210,9 +211,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     console.log("user fetched successfully")
+    const enrichedUser = await enrichUser(req.user);
     return res
         .status(200)
-        .json(new ApiResponse(200, req.user, "User fetched successfully"));
+        .json(new ApiResponse(200, enrichedUser, "User fetched successfully"));
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -238,7 +240,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         }
     }
 
-    const user = await User.findByIdAndUpdate(
+    const dbUser = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
@@ -248,12 +250,13 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
             }
         },
         { new: true, runValidators: true }
-    ).select("-password -refreshToken");
+    );
+    const enrichedUser = await enrichUser(dbUser);
 
     console.log("user updated successfully")
     return res
         .status(200)
-        .json(new ApiResponse(200, user, "Account details updated successfully"));
+        .json(new ApiResponse(200, enrichedUser, "Account details updated successfully"));
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
@@ -269,7 +272,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         avatarUrl = avatar.url;
     }
 
-    const user = await User.findByIdAndUpdate(
+    const dbUser = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
@@ -277,7 +280,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
             }
         },
         { new: true }
-    ).select("-password -refreshToken");
+    );
+    const enrichedUser = await enrichUser(dbUser);
 
     const message = avatarBuffer 
         ? "Avatar image updated successfully" 
@@ -286,7 +290,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         console.log("Avatar updated successfully")
     return res
         .status(200)
-        .json(new ApiResponse(200, user, message));
+        .json(new ApiResponse(200, enrichedUser, message));
 });
 
 const googleAuth = asyncHandler(async (req, res) => {
@@ -331,7 +335,8 @@ const googleAuth = asyncHandler(async (req, res) => {
 
         const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
 
-        const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+        const dbUser = await User.findById(user._id);
+        const loggedInUser = await enrichUser(dbUser);
 
         const options = {
             httpOnly: true,
