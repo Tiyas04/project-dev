@@ -643,11 +643,13 @@ if (statusRes.ok) {
  */
 export async function fetchGitHubStats(username) {
     const headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": "project-dev-app",
     };
 
-    if (process.env.GITHUB_TOKEN) {
-        headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
+    let token = process.env.GITHUB_TOKEN;
+    if (token) {
+        token = token.trim().replace(/^["']|["']$/g, '');
+        headers["Authorization"] = `Bearer ${token}`;
     }
 
     const userRes = await fetch(`https://api.github.com/users/${username}`, { headers });
@@ -656,8 +658,8 @@ export async function fetchGitHubStats(username) {
             throw new Error(`GitHub user '${username}' not found`);
         }
         if (userRes.status === 403) {
-            const hasToken = !!process.env.GITHUB_TOKEN;
-            throw new Error(`GitHub API error or rate limited (Status: 403).${hasToken ? " Your GITHUB_TOKEN may be invalid or expired." : " Please configure a valid GITHUB_TOKEN in your backend environment to avoid rate limits."}`);
+            const hasToken = !!token;
+            throw new Error(`GitHub API error or rate limited (Status: 403).${hasToken ? ` A GITHUB_TOKEN of length ${token.length} is defined (starting with: ${token.substring(0, 4)}...), but it was rejected by GitHub (invalid, expired, or wrong scopes).` : " Please configure a valid GITHUB_TOKEN in your backend environment to avoid rate limits."}`);
         }
         throw new Error(`GitHub API error or rate limited (Status: ${userRes.status})`);
     }
