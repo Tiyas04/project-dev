@@ -1,40 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Trophy, TrendingUp, Code2, Medal, Target, Activity, Flame } from "lucide-react";
+import { Trophy, TrendingUp, Code2, Medal, Target, Activity, Flame, RefreshCw } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
-const mockDashboardData = {
-  LeetCode: [
-    { label: "Max Streak", value: "45 Days", icon: <Flame size={24} className="text-orange-500" /> },
-    { label: "Current Rating", value: "1645", icon: <TrendingUp size={24} className="text-green-600" /> },
-    { label: "Best Rating", value: "1720", icon: <Medal size={24} className="text-yellow-600" /> },
-    { label: "Problems Solved", value: "350", icon: <Code2 size={24} className="text-purple-600" /> },
-    { label: "Global Ranking", value: "Top 12%", icon: <Target size={24} className="text-red-600" /> },
-    { label: "Contests", value: "28", icon: <Activity size={24} className="text-blue-600" /> },
-  ],
-  Codeforces: [
-    { label: "Max Streak", value: "12 Days", icon: <Flame size={24} className="text-orange-500" /> },
-    { label: "Current Rating", value: "1420", icon: <TrendingUp size={24} className="text-green-600" /> },
-    { label: "Best Rating", value: "1420", icon: <Medal size={24} className="text-yellow-600" /> },
-    { label: "Problems Solved", value: "205", icon: <Code2 size={24} className="text-purple-600" /> },
-    { label: "Global Ranking", value: "Specialist", icon: <Target size={24} className="text-red-600" /> },
-    { label: "Contests", value: "14", icon: <Activity size={24} className="text-blue-600" /> },
-  ],
-  GitHub: [
-    { label: "Public Repos", value: "34", icon: <Code2 size={24} className="text-gray-800" /> },
-    { label: "Contributions", value: "842 This Year", icon: <TrendingUp size={24} className="text-green-600" /> },
-    { label: "Current Streak", value: "8 Days", icon: <Flame size={24} className="text-orange-500" /> },
-    { label: "Followers", value: "128", icon: <Target size={24} className="text-blue-600" /> },
-    { label: "Stars Received", value: "48", icon: <Medal size={24} className="text-yellow-600" /> },
-    { label: "Pull Requests", value: "62", icon: <Activity size={24} className="text-blue-600" /> },
-  ]
-};
-
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, syncUserStats } = useAuth();
   const [platform, setPlatform] = useState<"LeetCode" | "Codeforces" | "GitHub">("LeetCode");
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncError, setSyncError] = useState("");
 
   const hasConnections = !!(user?.leetcode || user?.codeforces || user?.github);
 
@@ -51,39 +26,97 @@ export default function Dashboard() {
     }
   }, [user]);
 
-  const stats = mockDashboardData[platform];
+  const handleSync = async () => {
+    setIsSyncing(true);
+    setSyncError("");
+    try {
+      await syncUserStats();
+    } catch (err: any) {
+      console.error(err);
+      setSyncError("Sync failed. Try again.");
+      setTimeout(() => setSyncError(""), 4000);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const getPlatformStats = () => {
+    if (platform === "LeetCode") {
+      const lc = user?.stats?.leetcode;
+      return [
+        { label: "Max Streak", value: lc?.maxStreak !== undefined ? `${lc.maxStreak} Days` : "0 Days", icon: <Flame size={24} className="text-orange-500" /> },
+        { label: "Current Rating", value: lc?.currentRating?.toString() || "0", icon: <TrendingUp size={24} className="text-green-600" /> },
+        { label: "Best Rating", value: lc?.bestRating?.toString() || "0", icon: <Medal size={24} className="text-yellow-600" /> },
+        { label: "Problems Solved", value: lc?.problemsSolved?.toString() || "0", icon: <Code2 size={24} className="text-purple-600" /> },
+        { label: "Global Ranking", value: lc?.globalRanking || "Unrated", icon: <Target size={24} className="text-red-600" /> },
+        { label: "Contests", value: lc?.contests?.toString() || "0", icon: <Activity size={24} className="text-blue-600" /> },
+      ];
+    }
+    if (platform === "Codeforces") {
+      const cf = user?.stats?.codeforces;
+      return [
+        { label: "Max Streak", value: cf?.maxStreak !== undefined ? `${cf.maxStreak} Days` : "0 Days", icon: <Flame size={24} className="text-orange-500" /> },
+        { label: "Current Rating", value: cf?.currentRating?.toString() || "0", icon: <TrendingUp size={24} className="text-green-600" /> },
+        { label: "Best Rating", value: cf?.bestRating?.toString() || "0", icon: <Medal size={24} className="text-yellow-600" /> },
+        { label: "Problems Solved", value: cf?.problemsSolved?.toString() || "0", icon: <Code2 size={24} className="text-purple-600" /> },
+        { label: "Global Ranking", value: cf?.globalRanking || "unrated", icon: <Target size={24} className="text-red-600" /> },
+        { label: "Contests", value: cf?.contests?.toString() || "0", icon: <Activity size={24} className="text-blue-600" /> },
+      ];
+    }
+    if (platform === "GitHub") {
+      const gh = user?.stats?.github;
+      return [
+        { label: "Public Repos", value: gh?.publicRepos?.toString() || "0", icon: <Code2 size={24} className="text-gray-800" /> },
+        { label: "Contributions", value: gh?.contributions !== undefined ? `${gh.contributions} This Year` : "0 This Year", icon: <TrendingUp size={24} className="text-green-600" /> },
+        { label: "Current Streak", value: gh?.currentStreak !== undefined ? `${gh.currentStreak} Days` : "0 Days", icon: <Flame size={24} className="text-orange-500" /> },
+        { label: "Followers", value: gh?.followers?.toString() || "0", icon: <Target size={24} className="text-blue-600" /> },
+        { label: "Stars Received", value: gh?.starsReceived?.toString() || "0", icon: <Medal size={24} className="text-yellow-600" /> },
+        { label: "Pull Requests", value: gh?.pullRequests?.toString() || "0", icon: <Activity size={24} className="text-blue-600" /> },
+      ];
+    }
+    return [];
+  };
+
+  const stats = getPlatformStats();
 
   const activities = [];
   if (user?.leetcode) {
     activities.push({
       platform: "LeetCode",
       color: "bg-green-500",
-      content: <>Solved <span className="font-bold">"Two Sum"</span> on LeetCode</>,
-      time: "2h ago"
+      content: <>Connected LeetCode profile: <span className="font-bold">@{user.leetcode}</span></>,
+      time: "Active"
     });
   }
   if (user?.codeforces) {
     activities.push({
       platform: "Codeforces",
       color: "bg-blue-500",
-      content: <>Participated in <span className="font-bold">Codeforces Round 912</span></>,
-      time: "1d ago"
+      content: <>Connected Codeforces profile: <span className="font-bold">@{user.codeforces}</span></>,
+      time: "Active"
     });
   }
   if (user?.github) {
     activities.push({
       platform: "GitHub",
       color: "bg-purple-500",
-      content: <>Pushed <span className="font-bold">3 commits</span> to <span className="font-bold">project-dev</span> on GitHub</>,
-      time: "4h ago"
+      content: <>Connected GitHub profile: <span className="font-bold">@{user.github}</span></>,
+      time: "Active"
     });
   }
   if (hasConnections) {
     activities.push({
-      platform: "General",
-      color: "bg-yellow-500",
-      content: <>Achievement <span className="font-bold">Unlocked 100 Day Streak!</span></>,
-      time: "3d ago"
+      platform: "System",
+      color: "bg-blueprint-blue",
+      content: <>All developer statistics synchronized successfully</>,
+      time: "Synced"
+    });
+  } else {
+    activities.push({
+      platform: "System",
+      color: "bg-red-500",
+      content: <>No active platforms connected. Link profiles in Settings.</>,
+      time: "Pending"
     });
   }
 
@@ -148,10 +181,23 @@ export default function Dashboard() {
           {/* KPI Stats Grid */}
           {connectedTabs.includes(platform) && stats && (
             <section>
-              <h2 className="font-mono text-2xl font-bold text-sketch-black mb-6 flex items-center gap-3">
-                <span className="w-8 h-[3px] bg-blueprint-blue inline-block"></span>
-                Overview ({platform})
-              </h2>
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <h2 className="font-mono text-2xl font-bold text-sketch-black flex items-center gap-3">
+                  <span className="w-8 h-[3px] bg-blueprint-blue inline-block"></span>
+                  Overview ({platform})
+                </h2>
+                <div className="flex items-center gap-2">
+                  {syncError && <span className="text-xs font-mono text-red-500 font-bold">{syncError}</span>}
+                  <button
+                    onClick={handleSync}
+                    disabled={isSyncing}
+                    className="flex items-center gap-2 px-4 py-2 bg-blueprint-blue text-white font-mono text-xs font-bold rough-border hover:-translate-y-0.5 transition-transform disabled:opacity-55 cursor-pointer shadow-[2px_2px_0px_#171717]"
+                  >
+                    <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
+                    {isSyncing ? "Syncing..." : "Sync Stats"}
+                  </button>
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {stats.map((stat, i) => (
                   <div 

@@ -1,98 +1,29 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
 } from "recharts";
 import { BarChart2, Calendar, Target, Zap, Code2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
-type PlatformData = {
-  ratingData: { name: string, rating: number }[];
-  difficultyData: { name: string, value: number, color: string }[];
-  topicData: { subject: string, A: number, fullMark: number }[];
-  totalSolved: number;
-};
-
-const mockData: Record<string, PlatformData> = {
-  LeetCode: {
-    totalSolved: 350,
-    ratingData: [
-      { name: "Jan", rating: 1400 },
-      { name: "Feb", rating: 1450 },
-      { name: "Mar", rating: 1520 },
-      { name: "Apr", rating: 1600 },
-      { name: "May", rating: 1680 },
-      { name: "Jun", rating: 1750 },
-    ],
-    difficultyData: [
-      { name: "Easy", value: 100, color: "#22c55e" },
-      { name: "Medium", value: 200, color: "#eab308" },
-      { name: "Hard", value: 50, color: "#ef4444" },
-    ],
-    topicData: [
-      { subject: "Arrays", A: 95, fullMark: 100 },
-      { subject: "Strings", A: 80, fullMark: 100 },
-      { subject: "DP", A: 60, fullMark: 100 },
-      { subject: "Graphs", A: 65, fullMark: 100 },
-      { subject: "Trees", A: 85, fullMark: 100 },
-      { subject: "Math", A: 45, fullMark: 100 },
-    ]
-  },
-  Codeforces: {
-    totalSolved: 205,
-    ratingData: [
-      { name: "Jan", rating: 1100 },
-      { name: "Feb", rating: 1200 },
-      { name: "Mar", rating: 1250 },
-      { name: "Apr", rating: 1180 },
-      { name: "May", rating: 1300 },
-      { name: "Jun", rating: 1420 },
-    ],
-    difficultyData: [
-      { name: "Easy", value: 20, color: "#22c55e" },
-      { name: "Medium", value: 140, color: "#eab308" },
-      { name: "Hard", value: 45, color: "#ef4444" },
-    ],
-    topicData: [
-      { subject: "Arrays", A: 80, fullMark: 100 },
-      { subject: "Strings", A: 70, fullMark: 100 },
-      { subject: "DP", A: 75, fullMark: 100 },
-      { subject: "Graphs", A: 80, fullMark: 100 },
-      { subject: "Trees", A: 60, fullMark: 100 },
-      { subject: "Math", A: 85, fullMark: 100 },
-    ]
-  },
-  GitHub: {
-    totalSolved: 34,
-    ratingData: [
-      { name: "Jan", rating: 120 },
-      { name: "Feb", rating: 180 },
-      { name: "Mar", rating: 290 },
-      { name: "Apr", rating: 410 },
-      { name: "May", rating: 620 },
-      { name: "Jun", rating: 842 },
-    ],
-    difficultyData: [
-      { name: "TypeScript", value: 18, color: "#3178c6" },
-      { name: "JavaScript", value: 10, color: "#f7df1e" },
-      { name: "CSS/HTML", value: 6, color: "#e34c26" },
-    ],
-    topicData: [
-      { subject: "React/Next.js", A: 90, fullMark: 100 },
-      { subject: "APIs", A: 85, fullMark: 100 },
-      { subject: "Databases", A: 70, fullMark: 100 },
-      { subject: "DevOps", A: 45, fullMark: 100 },
-      { subject: "Testing", A: 60, fullMark: 100 },
-      { subject: "Node.js", A: 80, fullMark: 100 },
-    ]
-  }
-};
-
 export default function Stats() {
-  const { user } = useAuth();
+  const { user, checkAuth } = useAuth();
   const [timeRange, setTimeRange] = useState("6M");
   const [platform, setPlatform] = useState<"LeetCode" | "Codeforces" | "GitHub">("LeetCode");
 
@@ -106,20 +37,35 @@ export default function Stats() {
   });
 
   useEffect(() => {
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
     if (connectedTabs.length > 0 && !connectedTabs.includes(platform)) {
       setPlatform(connectedTabs[0]);
     }
   }, [user]);
 
-  const currentData = mockData[platform];
+  // Extract stats dynamically
+  const platformKey = platform.toLowerCase();
+  const platformStats = user?.stats?.[platformKey as keyof typeof user.stats] as any;
+
+  const currentData = platformStats
+    ? {
+        totalSolved: platform === "GitHub" ? platformStats.publicRepos || 0 : platformStats.problemsSolved || 0,
+        ratingData: platformStats.ratingData || [],
+        difficultyData: platformStats.difficultySolved || [],
+        topicData: platformStats.topicData || [],
+      }
+    : null;
 
   // Custom Tooltip for Recharts
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 rough-border shadow-[2px_2px_0px_#171717] font-mono">
+        <div className="bg-white p-3 rough-border shadow-[2px_2px_0px_#171717] font-mono text-xs">
           <p className="font-bold text-sketch-black">{label}</p>
-          <p className="text-blueprint-blue">{`Rating: ${payload[0].value}`}</p>
+          <p className="text-blueprint-blue">{`${platform === "GitHub" ? "Contributions" : "Rating"}: ${payload[0].value}`}</p>
         </div>
       );
     }
@@ -133,11 +79,9 @@ export default function Stats() {
           <div className="w-12 h-12 bg-blueprint-blue text-white flex items-center justify-center font-sketch text-3xl rough-border-blue transform rotate-6">
             <BarChart2 size={28} />
           </div>
-          <h1 className="font-sketch text-4xl md:text-5xl text-sketch-black">
-            Analytics
-          </h1>
+          <h1 className="font-sketch text-4xl md:text-5xl text-sketch-black">Analytics</h1>
         </div>
-        
+
         {/* Time Filter */}
         {hasConnections && (
           <div className="flex bg-paper rough-border p-1">
@@ -145,10 +89,8 @@ export default function Stats() {
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
-                className={`px-4 py-1 font-mono text-sm font-bold transition-colors ${
-                  timeRange === range 
-                    ? "bg-blueprint-blue text-white" 
-                    : "text-sketch-black hover:bg-gray-100"
+                className={`px-4 py-1 font-mono text-sm font-bold transition-colors cursor-pointer ${
+                  timeRange === range ? "bg-blueprint-blue text-white" : "text-sketch-black hover:bg-gray-100"
                 }`}
               >
                 {range}
@@ -169,8 +111,8 @@ export default function Stats() {
               Please connect your competitive programming or GitHub accounts in the profile settings to view detailed growth metrics, language breakdowns, and topic strength graphs.
             </p>
           </div>
-          <Link 
-            href="/profile" 
+          <Link
+            href="/profile"
             className="px-8 py-4 bg-blueprint-blue text-white font-bold font-mono text-lg rough-border-blue hover:-translate-y-1 transition-transform shadow-[4px_4px_0px_#171717]"
           >
             Connect Accounts
@@ -184,9 +126,9 @@ export default function Stats() {
               <button
                 key={p}
                 onClick={() => setPlatform(p)}
-                className={`flex items-center gap-2 px-6 py-3 font-mono font-bold transition-transform ${
-                  platform === p 
-                    ? "bg-blueprint-blue text-white rough-border shadow-[4px_4px_0px_#171717] -translate-y-1" 
+                className={`flex items-center gap-2 px-6 py-3 font-mono font-bold transition-transform cursor-pointer ${
+                  platform === p
+                    ? "bg-blueprint-blue text-white rough-border shadow-[4px_4px_0px_#171717] -translate-y-1"
                     : "bg-paper text-sketch-black rough-border hover:bg-gray-100"
                 }`}
               >
@@ -208,13 +150,13 @@ export default function Stats() {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={currentData.ratingData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                      <XAxis dataKey="name" stroke="#171717" fontFamily="var(--font-space-mono)" tick={{fontSize: 12}} />
-                      <YAxis stroke="#171717" fontFamily="var(--font-space-mono)" tick={{fontSize: 12}} />
+                      <XAxis dataKey="name" stroke="#171717" fontFamily="var(--font-space-mono)" tick={{ fontSize: 12 }} />
+                      <YAxis stroke="#171717" fontFamily="var(--font-space-mono)" tick={{ fontSize: 12 }} />
                       <RechartsTooltip content={<CustomTooltip />} />
-                      <Line 
-                        type="monotone" 
-                        dataKey="rating" 
-                        stroke="#1E3A8A" 
+                      <Line
+                        type="monotone"
+                        dataKey="rating"
+                        stroke="#1E3A8A"
                         strokeWidth={3}
                         dot={{ r: 4, fill: "#1E3A8A", strokeWidth: 2, stroke: "#fff" }}
                         activeDot={{ r: 6, fill: "#1E3A8A", strokeWidth: 0 }}
@@ -225,7 +167,7 @@ export default function Stats() {
               </section>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Problem Difficulty Distribution */}
+                {/* Problem Difficulty / Language Distribution */}
                 <section className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717] flex flex-col">
                   <h3 className="font-mono text-xl font-bold text-sketch-black mb-6 flex items-center gap-2">
                     <Target size={20} className="text-blueprint-blue" />
@@ -245,14 +187,14 @@ export default function Stats() {
                             dataKey="value"
                             stroke="none"
                           >
-                            {currentData.difficultyData.map((entry, index) => (
+                            {currentData.difficultyData.map((entry: any, index: number) => (
                               <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
                           </Pie>
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
-                    
+
                     <div className="flex flex-col gap-4 w-full lg:w-auto">
                       <div className="text-center lg:text-left mb-2">
                         <p className="font-mono text-sm text-sketch-black/60">
@@ -260,7 +202,7 @@ export default function Stats() {
                         </p>
                         <p className="font-mono text-3xl font-bold text-sketch-black">{currentData.totalSolved}</p>
                       </div>
-                      {currentData.difficultyData.map((item) => (
+                      {currentData.difficultyData.map((item: any) => (
                         <div key={item.name} className="flex items-center justify-between gap-4 font-mono text-sm">
                           <div className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: item.color }}></div>
@@ -283,7 +225,10 @@ export default function Stats() {
                     <ResponsiveContainer width="100%" height="100%">
                       <RadarChart cx="50%" cy="50%" outerRadius="80%" data={currentData.topicData}>
                         <PolarGrid stroke="#e5e7eb" />
-                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#171717', fontSize: 12, fontFamily: 'var(--font-space-mono)' }} />
+                        <PolarAngleAxis
+                          dataKey="subject"
+                          tick={{ fill: "#171717", fontSize: 12, fontFamily: "var(--font-space-mono)" }}
+                        />
                         <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                         <Radar
                           name="Score"

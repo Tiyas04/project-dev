@@ -22,6 +22,10 @@ export default function Profile() {
   const [cfUsername, setCfUsername] = useState("");
   const [ghUsername, setGhUsername] = useState("");
 
+  const [isConnecting, setIsConnecting] = useState<Record<string, boolean>>({});
+  const [isDisconnecting, setIsDisconnecting] = useState<Record<string, boolean>>({});
+  const [connectionError, setConnectionError] = useState<Record<string, string>>({});
+
   const hasConnections = !!(user?.leetcode || user?.codeforces || user?.github);
   const connectedPlatformsCount = [user?.leetcode, user?.codeforces, user?.github].filter(Boolean).length;
 
@@ -40,6 +44,42 @@ export default function Profile() {
       setEmail(user.email);
     }
   }, [user]);
+
+  const handleConnect = async (platform: "leetcode" | "codeforces" | "github", usernameVal: string) => {
+    if (!usernameVal.trim()) return;
+    setIsConnecting(prev => ({ ...prev, [platform]: true }));
+    setConnectionError(prev => ({ ...prev, [platform]: "" }));
+    try {
+      await connectPlatform(platform, usernameVal.trim());
+      if (platform === "leetcode") setLcUsername("");
+      if (platform === "codeforces") setCfUsername("");
+      if (platform === "github") setGhUsername("");
+    } catch (err: any) {
+      console.error(err);
+      setConnectionError(prev => ({
+        ...prev,
+        [platform]: err.response?.data?.message || `Failed to connect to ${platform}. Please check the username.`
+      }));
+    } finally {
+      setIsConnecting(prev => ({ ...prev, [platform]: false }));
+    }
+  };
+
+  const handleDisconnect = async (platform: "leetcode" | "codeforces" | "github") => {
+    setIsDisconnecting(prev => ({ ...prev, [platform]: true }));
+    setConnectionError(prev => ({ ...prev, [platform]: "" }));
+    try {
+      await disconnectPlatform(platform);
+    } catch (err: any) {
+      console.error(err);
+      setConnectionError(prev => ({
+        ...prev,
+        [platform]: err.response?.data?.message || `Failed to disconnect from ${platform}.`
+      }));
+    } finally {
+      setIsDisconnecting(prev => ({ ...prev, [platform]: false }));
+    }
+  };
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -175,10 +215,11 @@ export default function Profile() {
                     <span className="font-mono text-sm text-sketch-black font-bold">@{user.leetcode}</span>
                     <button
                       type="button"
-                      onClick={() => disconnectPlatform("leetcode")}
-                      className="text-xs font-mono text-red-500 hover:text-red-700 font-bold underline"
+                      disabled={isDisconnecting["leetcode"]}
+                      onClick={() => handleDisconnect("leetcode")}
+                      className="text-xs font-mono text-red-500 hover:text-red-700 font-bold underline disabled:opacity-50 cursor-pointer"
                     >
-                      Disconnect
+                      {isDisconnecting["leetcode"] ? "Disconnecting..." : "Disconnect"}
                     </button>
                   </div>
                 ) : (
@@ -187,22 +228,22 @@ export default function Profile() {
                       type="text"
                       placeholder="Username..."
                       value={lcUsername}
+                      disabled={isConnecting["leetcode"]}
                       onChange={(e) => setLcUsername(e.target.value)}
-                      className="w-full px-2 py-1 bg-white rough-border text-xs font-mono outline-none"
+                      className="w-full px-2 py-1 bg-white rough-border text-xs font-mono outline-none disabled:bg-gray-100"
                     />
                     <button
                       type="button"
-                      onClick={() => {
-                        if (lcUsername.trim()) {
-                          connectPlatform("leetcode", lcUsername.trim());
-                          setLcUsername("");
-                        }
-                      }}
-                      className="w-full text-xs font-mono bg-blueprint-blue text-white py-1.5 font-bold border-2 border-sketch-black shadow-[2px_2px_0px_#171717] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all cursor-pointer text-center block"
+                      disabled={isConnecting["leetcode"] || !lcUsername.trim()}
+                      onClick={() => handleConnect("leetcode", lcUsername)}
+                      className="w-full text-xs font-mono bg-blueprint-blue text-white py-1.5 font-bold border-2 border-sketch-black shadow-[2px_2px_0px_#171717] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all cursor-pointer text-center block disabled:opacity-55"
                     >
-                      Connect LeetCode
+                      {isConnecting["leetcode"] ? "Connecting..." : "Connect LeetCode"}
                     </button>
                   </div>
+                )}
+                {connectionError["leetcode"] && (
+                  <p className="text-[10px] font-mono text-red-500 mt-1 font-bold">{connectionError["leetcode"]}</p>
                 )}
               </div>
 
@@ -224,10 +265,11 @@ export default function Profile() {
                     <span className="font-mono text-sm text-sketch-black font-bold">@{user.codeforces}</span>
                     <button
                       type="button"
-                      onClick={() => disconnectPlatform("codeforces")}
-                      className="text-xs font-mono text-red-500 hover:text-red-700 font-bold underline"
+                      disabled={isDisconnecting["codeforces"]}
+                      onClick={() => handleDisconnect("codeforces")}
+                      className="text-xs font-mono text-red-500 hover:text-red-700 font-bold underline disabled:opacity-50 cursor-pointer"
                     >
-                      Disconnect
+                      {isDisconnecting["codeforces"] ? "Disconnecting..." : "Disconnect"}
                     </button>
                   </div>
                 ) : (
@@ -236,22 +278,22 @@ export default function Profile() {
                       type="text"
                       placeholder="Username..."
                       value={cfUsername}
+                      disabled={isConnecting["codeforces"]}
                       onChange={(e) => setCfUsername(e.target.value)}
-                      className="w-full px-2 py-1 bg-white rough-border text-xs font-mono outline-none"
+                      className="w-full px-2 py-1 bg-white rough-border text-xs font-mono outline-none disabled:bg-gray-100"
                     />
                     <button
                       type="button"
-                      onClick={() => {
-                        if (cfUsername.trim()) {
-                          connectPlatform("codeforces", cfUsername.trim());
-                          setCfUsername("");
-                        }
-                      }}
-                      className="w-full text-xs font-mono bg-blueprint-blue text-white py-1.5 font-bold border-2 border-sketch-black shadow-[2px_2px_0px_#171717] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all cursor-pointer text-center block"
+                      disabled={isConnecting["codeforces"] || !cfUsername.trim()}
+                      onClick={() => handleConnect("codeforces", cfUsername)}
+                      className="w-full text-xs font-mono bg-blueprint-blue text-white py-1.5 font-bold border-2 border-sketch-black shadow-[2px_2px_0px_#171717] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all cursor-pointer text-center block disabled:opacity-55"
                     >
-                      Connect Codeforces
+                      {isConnecting["codeforces"] ? "Connecting..." : "Connect Codeforces"}
                     </button>
                   </div>
+                )}
+                {connectionError["codeforces"] && (
+                  <p className="text-[10px] font-mono text-red-500 mt-1 font-bold">{connectionError["codeforces"]}</p>
                 )}
               </div>
 
@@ -273,10 +315,11 @@ export default function Profile() {
                     <span className="font-mono text-sm text-sketch-black font-bold">@{user.github}</span>
                     <button
                       type="button"
-                      onClick={() => disconnectPlatform("github")}
-                      className="text-xs font-mono text-red-500 hover:text-red-700 font-bold underline"
+                      disabled={isDisconnecting["github"]}
+                      onClick={() => handleDisconnect("github")}
+                      className="text-xs font-mono text-red-500 hover:text-red-700 font-bold underline disabled:opacity-50 cursor-pointer"
                     >
-                      Disconnect
+                      {isDisconnecting["github"] ? "Disconnecting..." : "Disconnect"}
                     </button>
                   </div>
                 ) : (
@@ -285,22 +328,22 @@ export default function Profile() {
                       type="text"
                       placeholder="Username..."
                       value={ghUsername}
+                      disabled={isConnecting["github"]}
                       onChange={(e) => setGhUsername(e.target.value)}
-                      className="w-full px-2 py-1 bg-white rough-border text-xs font-mono outline-none"
+                      className="w-full px-2 py-1 bg-white rough-border text-xs font-mono outline-none disabled:bg-gray-100"
                     />
                     <button
                       type="button"
-                      onClick={() => {
-                        if (ghUsername.trim()) {
-                          connectPlatform("github", ghUsername.trim());
-                          setGhUsername("");
-                        }
-                      }}
-                      className="w-full text-xs font-mono bg-blueprint-blue text-white py-1.5 font-bold border-2 border-sketch-black shadow-[2px_2px_0px_#171717] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all cursor-pointer text-center block"
+                      disabled={isConnecting["github"] || !ghUsername.trim()}
+                      onClick={() => handleConnect("github", ghUsername)}
+                      className="w-full text-xs font-mono bg-blueprint-blue text-white py-1.5 font-bold border-2 border-sketch-black shadow-[2px_2px_0px_#171717] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all cursor-pointer text-center block disabled:opacity-55"
                     >
-                      Connect GitHub
+                      {isConnecting["github"] ? "Connecting..." : "Connect GitHub"}
                     </button>
                   </div>
+                )}
+                {connectionError["github"] && (
+                  <p className="text-[10px] font-mono text-red-500 mt-1 font-bold">{connectionError["github"]}</p>
                 )}
               </div>
             </div>
@@ -458,19 +501,19 @@ export default function Profile() {
                     {user?.leetcode && (
                       <div className="bg-white p-2 border-2 border-sketch-black shadow-sm">
                         <p className="text-[10px] text-sketch-black/60 font-bold uppercase">LeetCode Solved</p>
-                        <p className="text-xl font-bold text-sketch-black">342</p>
+                        <p className="text-xl font-bold text-sketch-black">{user.stats?.leetcode?.problemsSolved ?? 0}</p>
                       </div>
                     )}
                     {user?.codeforces && (
                       <div className="bg-white p-2 border-2 border-sketch-black shadow-sm">
                         <p className="text-[10px] text-sketch-black/60 font-bold uppercase">CF Rating</p>
-                        <p className="text-xl font-bold text-blueprint-blue">1450</p>
+                        <p className="text-xl font-bold text-blueprint-blue">{user.stats?.codeforces?.currentRating ?? 0}</p>
                       </div>
                     )}
                     {user?.github && (
                       <div className="bg-white p-2 border-2 border-sketch-black shadow-sm">
                         <p className="text-[10px] text-sketch-black/60 font-bold uppercase">Git Contributions</p>
-                        <p className="text-xl font-bold text-green-600">842</p>
+                        <p className="text-xl font-bold text-green-600">{user.stats?.github?.contributions ?? 0}</p>
                       </div>
                     )}
                   </div>
