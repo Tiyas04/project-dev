@@ -23,10 +23,12 @@ Welcome to **DevArena**! DevArena is a modern, all-in-one competitive programmin
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 19, Next.js 15 (App Router), TypeScript, Tailwind CSS, Framer Motion, Recharts, Axios |
+| **Frontend** | React 19, Next.js 16 (App Router), TypeScript, Tailwind CSS 4, Framer Motion, Recharts, Axios |
 | **Backend** | Node.js, Express, REST APIs, JSON Web Tokens (JWT), Cookie Parser, Cors |
 | **Database** | MongoDB Atlas, Mongoose (with advanced aggregation pagination) |
 | **Media Handling** | Multer, Cloudinary API |
+| **Caching & Jobs** | Redis, BullMQ |
+| **AI** | Gemini API |
 
 ---
 
