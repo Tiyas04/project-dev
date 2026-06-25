@@ -79,6 +79,82 @@ export default function Dashboard() {
 
   const stats = getPlatformStats();
 
+  const platformStats = user?.stats?.[platform.toLowerCase() as keyof typeof user.stats] as any;
+
+  const getAchievements = () => {
+    const list: { title: string; desc: string; date: string }[] = [];
+    if (!platformStats) {
+      return [{ title: "Platform Locked", desc: "Connect profile to start unlocking achievements.", date: "LOCKED" }];
+    }
+
+    if (platform === "LeetCode") {
+      const solved = platformStats.problemsSolved || 0;
+      const streakVal = platformStats.maxStreak || 0;
+      const contests = platformStats.contests || 0;
+
+      if (solved > 0) {
+        list.push({ title: "First Blood", desc: "Solve your first problem on LeetCode", date: "UNLOCKED" });
+      }
+      if (streakVal >= 30) {
+        list.push({ title: "Consistency", desc: "Maintain a 30+ day streak on LeetCode", date: "UNLOCKED" });
+      }
+      if (solved >= 100) {
+        list.push({ title: "Centurion", desc: "Solve 100+ problems on LeetCode", date: "UNLOCKED" });
+      }
+      if (solved >= 300) {
+        list.push({ title: "Elite Solver", desc: "Solve 300+ problems on LeetCode", date: "UNLOCKED" });
+      }
+      if (contests > 0) {
+        list.push({ title: "Weekend Warrior", desc: "Attend your first LeetCode contest", date: "UNLOCKED" });
+      }
+    } else if (platform === "Codeforces") {
+      const solved = platformStats.problemsSolved || 0;
+      const rating = platformStats.currentRating || 0;
+      const contests = platformStats.contests || 0;
+
+      if (solved > 0) {
+        list.push({ title: "First Contest Solved", desc: "Solve your first problem on Codeforces", date: "UNLOCKED" });
+      }
+      if (contests > 0) {
+        list.push({ title: "CF Contender", desc: "Participate in your first Codeforces contest", date: "UNLOCKED" });
+      }
+      if (rating >= 1200) {
+        list.push({ title: "Pupil Rank", desc: "Reach Pupil rank on Codeforces (1200+)", date: "UNLOCKED" });
+      }
+      if (rating >= 1400) {
+        list.push({ title: "Specialist Rank", desc: "Reach Specialist rank on Codeforces (1400+)", date: "UNLOCKED" });
+      }
+      if (rating >= 1600) {
+        list.push({ title: "Expert Rank", desc: "Reach Expert rank on Codeforces (1600+)", date: "UNLOCKED" });
+      }
+    } else if (platform === "GitHub") {
+      const repos = platformStats.publicRepos || 0;
+      const contributions = platformStats.contributions || 0;
+      const stars = platformStats.starsReceived || 0;
+      const prs = platformStats.pullRequests || 0;
+
+      if (repos > 0) {
+        list.push({ title: "First Repo", desc: "Create a public repository on GitHub", date: "UNLOCKED" });
+      }
+      if (contributions >= 100) {
+        list.push({ title: "Active Contributor", desc: "Reach 100+ contributions this year", date: "UNLOCKED" });
+      }
+      if (prs >= 10) {
+        list.push({ title: "PR Champion", desc: "Open 10+ pull requests on GitHub", date: "UNLOCKED" });
+      }
+      if (stars >= 5) {
+        list.push({ title: "Star Catcher", desc: "Receive 5+ stars on your repositories", date: "UNLOCKED" });
+      }
+    }
+
+    if (list.length === 0) {
+      list.push({ title: "Getting Started", desc: "Solve problems or push code to unlock badges!", date: "IN PROGRESS" });
+    }
+    return list;
+  };
+
+  const achievements = getAchievements();
+
   const activities = [];
   if (user?.leetcode) {
     activities.push({
@@ -161,18 +237,18 @@ export default function Dashboard() {
       ) : (
         <>
           {/* Platform Tabs */}
-          <div className="flex gap-4 border-b-2 border-dashed border-sketch-black/20 pb-4">
+          <div className="flex gap-2 sm:gap-4 border-b-2 border-dashed border-sketch-black/20 pb-4 overflow-x-auto select-none no-scrollbar">
             {connectedTabs.map((p) => (
               <button
                 key={p}
                 onClick={() => setPlatform(p)}
-                className={`flex items-center gap-2 px-6 py-3 font-mono font-bold transition-transform ${
-                  platform === p 
-                    ? "bg-blueprint-blue text-white rough-border shadow-[4px_4px_0px_#171717] -translate-y-1" 
+                className={`flex items-center gap-1.5 px-3 py-2 sm:px-6 sm:py-3 font-mono font-bold text-xs sm:text-sm transition-all duration-300 cursor-pointer shrink-0 ${
+                  platform === p
+                    ? "bg-blueprint-blue text-white rough-border shadow-[2px_2px_0px_#171717] -translate-y-0.5 sm:-translate-y-1 sm:shadow-[4px_4px_0px_#171717]"
                     : "bg-paper text-sketch-black rough-border hover:bg-gray-100"
                 }`}
               >
-                <Code2 size={18} />
+                <Code2 size={14} className="sm:w-[18px] sm:h-[18px]" />
                 {p}
               </button>
             ))}
@@ -210,6 +286,35 @@ export default function Dashboard() {
                     </div>
                     <div className="p-3 bg-paper rough-border-blue group-hover:scale-110 transition-transform">
                       {stat.icon}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Achievements / Badges Section */}
+          {connectedTabs.includes(platform) && achievements && (
+            <section className="bg-white p-6 md:p-8 rough-border shadow-[4px_4px_0px_#171717]">
+              <h3 className="font-mono text-xl font-bold text-sketch-black mb-6 pb-4 border-b-2 border-dashed border-sketch-black/10 flex items-center gap-2">
+                <Trophy size={20} className="text-blueprint-blue" />
+                Unlocked Achievements ({platform})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {achievements.map((badge, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-4 p-4 bg-paper rough-border group cursor-default hover:bg-sketch-black hover:text-white transition-colors duration-300 shadow-[2px_2px_0px_#171717] hover:shadow-[4px_4px_0px_#1E3A8A]"
+                  >
+                    <div className="w-12 h-12 shrink-0 bg-white rounded-full flex items-center justify-center rough-border-blue text-blueprint-blue group-hover:text-sketch-black group-hover:bg-white group-hover:border-white transition-all duration-300">
+                      <Trophy size={24} className="group-hover:scale-110 transition-transform" />
+                    </div>
+                    <div>
+                      <h4 className="font-mono font-bold text-sm mb-1">{badge.title}</h4>
+                      <p className="font-mono text-xs opacity-70 mb-2 leading-relaxed">{badge.desc}</p>
+                      <p className="font-mono text-[10px] font-bold text-blueprint-blue group-hover:text-blue-300 uppercase tracking-wider">
+                        {badge.date}
+                      </p>
                     </div>
                   </div>
                 ))}

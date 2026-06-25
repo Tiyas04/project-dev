@@ -14,6 +14,139 @@ const LANGUAGE_COLORS = {
     PHP: "#4F5D95",
 };
 
+const PROBLEM_POOL = {
+    easy: [
+        { title: "Two Sum", slug: "two-sum", tags: ["array", "hash-table"] },
+        { title: "Roman to Integer", slug: "roman-to-integer", tags: ["math", "string"] },
+        { title: "Palindrome Number", slug: "palindrome-number", tags: ["math"] },
+        { title: "Merge Two Sorted Lists", slug: "merge-two-sorted-lists", tags: ["linked-list"] },
+        { title: "Remove Duplicates from Sorted Array", slug: "remove-duplicates-from-sorted-array", tags: ["array"] },
+        { title: "Valid Parentheses", slug: "valid-parentheses", tags: ["string", "stack"] },
+        { title: "Search Insert Position", slug: "search-insert-position", tags: ["array", "binary-search"] },
+        { title: "Length of Last Word", slug: "length-of-last-word", tags: ["string"] },
+        { title: "Plus One", slug: "plus-one", tags: ["array", "math"] },
+        { title: "Climbing Stairs", slug: "climbing-stairs", tags: ["dynamic-programming", "math"] },
+        { title: "Symmetric Tree", slug: "symmetric-tree", tags: ["tree", "depth-first-search"] },
+        { title: "Maximum Depth of Binary Tree", slug: "maximum-depth-of-binary-tree", tags: ["tree", "depth-first-search"] },
+        { title: "Best Time to Buy and Sell Stock", slug: "best-time-to-buy-and-sell-stock", tags: ["array", "dynamic-programming"] },
+        { title: "Valid Palindrome", slug: "valid-palindrome", tags: ["two-pointers", "string"] },
+        { title: "Single Number", slug: "single-number", tags: ["bit-manipulation", "array"] },
+        { title: "Linked List Cycle", slug: "linked-list-cycle", tags: ["linked-list", "two-pointers"] },
+        { title: "Binary Tree Postorder Traversal", slug: "binary-tree-postorder-traversal", tags: ["tree", "depth-first-search"] },
+        { title: "Min Stack", slug: "min-stack", tags: ["stack"] },
+        { title: "Intersection of Two Linked Lists", slug: "intersection-of-two-linked-lists", tags: ["linked-list", "two-pointers"] },
+        { title: "Excel Sheet Column Title", slug: "excel-sheet-column-title", tags: ["math", "string"] },
+        { title: "Majority Element", slug: "majority-element", tags: ["array", "hash-table"] },
+        { title: "Reverse Bits", slug: "reverse-bits", tags: ["bit-manipulation"] },
+        { title: "Number of 1 Bits", slug: "number-of-1-bits", tags: ["bit-manipulation"] },
+        { title: "Happy Number", slug: "happy-number", tags: ["math", "hash-table"] },
+        { title: "Isomorphic Strings", slug: "isomorphic-strings", tags: ["hash-table", "string"] },
+        { title: "Contains Duplicate", slug: "contains-duplicate", tags: ["array", "hash-table"] },
+        { title: "Invert Binary Tree", slug: "invert-binary-tree", tags: ["tree", "depth-first-search"] },
+        { title: "Summary Ranges", slug: "summary-ranges", tags: ["array"] },
+        { title: "Power of Two", slug: "power-of-two", tags: ["math", "bit-manipulation"] },
+        { title: "Valid Anagram", slug: "valid-anagram", tags: ["hash-table", "string", "sorting"] },
+        { title: "Binary Tree Paths", slug: "binary-tree-paths", tags: ["tree", "depth-first-search"] },
+        { title: "Add Digits", slug: "add-digits", tags: ["math"] },
+        { title: "Ugly Number", slug: "ugly-number", tags: ["math"] },
+        { title: "Missing Number", slug: "missing-number", tags: ["array", "math", "bit-manipulation"] },
+        { title: "Move Zeroes", slug: "move-zeroes", tags: ["array", "two-pointers"] },
+        { title: "Word Pattern", slug: "word-pattern", tags: ["hash-table", "string"] },
+        { title: "Nim Game", slug: "nim-game", tags: ["brainteaser", "math"] },
+        { title: "Counting Bits", slug: "counting-bits", tags: ["dynamic-programming", "bit-manipulation"] },
+        { title: "Power of Three", slug: "power-of-three", tags: ["math"] },
+        { title: "Reverse String", slug: "reverse-string", tags: ["two-pointers", "string"] },
+        { title: "Intersection of Two Arrays", slug: "intersection-of-two-arrays", tags: ["array", "hash-table", "sorting"] },
+        { title: "Sum of Two Integers", slug: "sum-of-two-integers", tags: ["math", "bit-manipulation"] },
+        { title: "First Unique Character in a String", slug: "first-unique-character-in-a-string", tags: ["hash-table", "string"] },
+        { title: "Fizz Buzz", slug: "fizz-buzz", tags: ["string", "simulation"] },
+        { title: "Third Maximum Number", slug: "third-maximum-number", tags: ["array", "sorting"] },
+        { title: "Add Strings", slug: "add-strings", tags: ["math", "string"] },
+        { title: "Number of Segments in a String", slug: "number-of-segments-in-a-string", tags: ["string"] },
+        { title: "Arranging Coins", slug: "arranging-coins", tags: ["math", "binary-search"] }
+    ],
+    medium: [
+        { title: "Add Two Numbers", slug: "add-two-numbers", tags: ["linked-list", "math"] },
+        { title: "Longest Substring Without Repeating Characters", slug: "longest-substring-without-repeating-characters", tags: ["hash-table", "string", "sliding-window"] },
+        { title: "Longest Palindromic Substring", slug: "longest-palindromic-substring", tags: ["string", "dynamic-programming"] },
+        { title: "Container With Most Water", slug: "container-with-most-water", tags: ["array", "two-pointers", "greedy"] },
+        { title: "3Sum", slug: "3sum", tags: ["array", "two-pointers", "sorting"] },
+        { title: "Letter Combinations of a Phone Number", slug: "letter-combinations-of-a-phone-number", tags: ["string", "backtracking"] },
+        { title: "Remove Nth Node From End of List", slug: "remove-nth-node-from-end-of-list", tags: ["linked-list", "two-pointers"] },
+        { title: "Generate Parentheses", slug: "generate-parentheses", tags: ["string", "backtracking"] },
+        { title: "Divide Two Integers", slug: "divide-two-integers", tags: ["math", "bit-manipulation"] },
+        { title: "Next Permutation", slug: "next-permutation", tags: ["array", "two-pointers"] },
+        { title: "Search in Rotated Sorted Array", slug: "search-in-rotated-sorted-array", tags: ["array", "binary-search"] },
+        { title: "Group Anagrams", slug: "group-anagrams", tags: ["hash-table", "string", "sorting"] },
+        { title: "Pow(x, n)", slug: "powx-n", tags: ["math", "recursion"] },
+        { title: "Spiral Matrix", slug: "spiral-matrix", tags: ["array", "matrix", "simulation"] },
+        { title: "Jump Game", slug: "jump-game", tags: ["array", "dynamic-programming", "greedy"] },
+        { title: "Merge Intervals", slug: "merge-intervals", tags: ["array", "sorting"] },
+        { title: "Unique Paths", slug: "unique-paths", tags: ["dynamic-programming", "combinatorics"] },
+        { title: "Minimum Path Sum", slug: "minimum-path-sum", tags: ["array", "dynamic-programming", "matrix"] },
+        { title: "Subsets", slug: "subsets", tags: ["array", "backtracking", "bit-manipulation"] },
+        { title: "Word Search", slug: "word-search", tags: ["array", "backtracking", "matrix"] },
+        { title: "Decode Ways", slug: "decode-ways", tags: ["string", "dynamic-programming"] },
+        { title: "Validate Binary Search Tree", slug: "validate-binary-search-tree", tags: ["tree", "depth-first-search", "binary-search-tree"] },
+        { title: "Binary Tree Level Order Traversal", slug: "binary-tree-level-order-traversal", tags: ["tree", "breadth-first-search"] },
+        { title: "Construct Binary Tree from Preorder and Inorder Traversal", slug: "construct-binary-tree-from-preorder-and-inorder-traversal", tags: ["tree", "array", "divide-and-conquer"] },
+        { title: "Convert Sorted Array to Binary Search Tree", slug: "convert-sorted-array-to-binary-search-tree", tags: ["tree", "depth-first-search"] },
+        { title: "Path Sum II", slug: "path-sum-ii", tags: ["tree", "depth-first-search"] },
+        { title: "Flatten Binary Tree to Linked List", slug: "flatten-binary-tree-to-linked-list", tags: ["tree", "depth-first-search"] },
+        { title: "Populating Next Right Pointers in Each Node", slug: "populating-next-right-pointers-in-each-node", tags: ["tree", "depth-first-search", "breadth-first-search"] },
+        { title: "Best Time to Buy and Sell Stock II", slug: "best-time-to-buy-and-sell-stock-ii", tags: ["array", "dynamic-programming", "greedy"] },
+        { title: "Single Number II", slug: "single-number-ii", tags: ["array", "bit-manipulation"] },
+        { title: "Word Break", slug: "word-break", tags: ["hash-table", "string", "dynamic-programming"] },
+        { title: "Linked List Cycle II", slug: "linked-list-cycle-ii", tags: ["linked-list", "two-pointers"] },
+        { title: "LRU Cache", slug: "lru-cache", tags: ["design", "hash-table", "doubly-linked-list"] },
+        { title: "Sort List", slug: "sort-list", tags: ["linked-list", "two-pointers", "divide-and-conquer", "sorting"] },
+        { title: "Maximum Product Subarray", slug: "maximum-product-subarray", tags: ["array", "dynamic-programming"] },
+        { title: "Find Minimum in Rotated Sorted Array", slug: "find-minimum-in-rotated-sorted-array", tags: ["array", "binary-search"] },
+        { title: "Fraction to Recurring Decimal", slug: "fraction-to-recurring-decimal", tags: ["hash-table", "math", "string"] },
+        { title: "Course Schedule", slug: "course-schedule", tags: ["depth-first-search", "breadth-first-search", "graph", "topological-sort"] },
+        { title: "Kth Largest Element in an Array", slug: "kth-largest-element-in-an-array", tags: ["array", "divide-and-conquer", "sorting", "heap"] },
+        { title: "Combination Sum III", slug: "combination-sum-iii", tags: ["array", "backtracking"] },
+        { title: "Number of Islands", slug: "number-of-islands", tags: ["array", "depth-first-search", "breadth-first-search", "union-find", "matrix"] },
+        { title: "House Robber", slug: "house-robber", tags: ["array", "dynamic-programming"] },
+        { title: "Basic Calculator II", slug: "basic-calculator-ii", tags: ["math", "string", "stack"] },
+        { title: "Product of Array Except Self", slug: "product-of-array-except-self", tags: ["array", "prefix-sum"] },
+        { title: "Search a 2D Matrix II", slug: "search-a-2d-matrix-ii", tags: ["array", "binary-search", "matrix", "divide-and-conquer"] },
+        { title: "Different Ways to Add Parentheses", slug: "different-ways-to-add-parentheses", tags: ["math", "string", "dynamic-programming", "recursion"] },
+        { title: "Single Number III", slug: "single-number-iii", tags: ["array", "bit-manipulation"] },
+        { title: "Ugly Number II", slug: "ugly-number-ii", tags: ["math", "dynamic-programming", "heap"] },
+        { title: "Coin Change", slug: "coin-change", tags: ["array", "dynamic-programming", "breadth-first-search"] },
+        { title: "Longest Increasing Subsequence", slug: "longest-increasing-subsequence", tags: ["array", "binary-search", "dynamic-programming"] },
+        { title: "Odd Even Linked List", slug: "odd-even-linked-list", tags: ["linked-list"] },
+        { title: "Kth Smallest Element in a BST", slug: "kth-smallest-element-in-a-bst", tags: ["tree", "depth-first-search", "binary-search-tree"] },
+        { title: "Top K Frequent Elements", slug: "top-k-frequent-elements", tags: ["array", "hash-table", "divide-and-conquer", "sorting", "heap"] },
+        { title: "Insert Delete GetRandom O(1)", slug: "insert-delete-getrandom-o1", tags: ["array", "hash-table", "math", "design"] },
+        { title: "Shuffle an Array", slug: "shuffle-an-array", tags: ["array", "math", "randomized"] },
+        { title: "Pacific Atlantic Water Flow", slug: "pacific-atlantic-water-flow", tags: ["depth-first-search", "breadth-first-search", "matrix"] },
+        { title: "Partition Equal Subset Sum", slug: "partition-equal-subset-sum", tags: ["array", "dynamic-programming"] },
+        { title: "Spiral Matrix II", slug: "spiral-matrix-ii", tags: ["array", "matrix", "simulation"] }
+    ],
+    hard: [
+        { title: "Median of Two Sorted Arrays", slug: "median-of-two-sorted-arrays", tags: ["array", "binary-search", "divide-and-conquer"] },
+        { title: "Regular Expression Matching", slug: "regular-expression-matching", tags: ["string", "dynamic-programming", "recursion"] },
+        { title: "Merge k Sorted Lists", slug: "merge-k-sorted-lists", tags: ["linked-list", "divide-and-conquer", "heap", "merge-sort"] },
+        { title: "First Missing Positive", slug: "first-missing-positive", tags: ["array", "hash-table"] },
+        { title: "Trapping Rain Water", slug: "trapping-rain-water", tags: ["array", "two-pointers", "dynamic-programming", "stack"] },
+        { title: "N-Queens", slug: "n-queens", tags: ["array", "backtracking"] },
+        { title: "Sudoku Solver", slug: "sudoku-solver", tags: ["array", "backtracking", "matrix"] },
+        { title: "Edit Distance", slug: "edit-distance", tags: ["string", "dynamic-programming"] },
+        { title: "Maximal Rectangle", slug: "maximal-rectangle", tags: ["array", "dynamic-programming", "stack", "matrix"] },
+        { title: "Binary Tree Maximum Path Sum", slug: "binary-tree-maximum-path-sum", tags: ["tree", "depth-first-search"] },
+        { title: "Word Ladder", slug: "word-ladder", tags: ["hash-table", "breadth-first-search", "string"] },
+        { title: "Longest Consecutive Sequence", slug: "longest-consecutive-sequence", tags: ["array", "union-find"] },
+        { title: "Max Points on a Line", slug: "max-points-on-a-line", tags: ["array", "hash-table", "math", "geometry"] },
+        { title: "Word Break II", slug: "word-break-ii", tags: ["hash-table", "string", "dynamic-programming", "backtracking", "trie"] },
+        { title: "Sliding Window Maximum", slug: "sliding-window-maximum", tags: ["array", "queue", "sliding-window", "heap", "monotonic-queue"] },
+        { title: "Largest Rectangle in Histogram", slug: "largest-rectangle-in-histogram", tags: ["array", "stack", "monotonic-stack"] },
+        { title: "Insert Interval", slug: "insert-interval", tags: ["array"] },
+        { title: "Minimum Window Substring", slug: "minimum-window-substring", tags: ["hash-table", "string", "sliding-window"] }
+    ]
+};
+
 /**
  * Helper to fetch tags and difficulty for a specific LeetCode problem
  * @param {string} titleSlug LeetCode problem title slug
@@ -97,11 +230,10 @@ export async function fetchLeetCodeStats(username, existingStats = {}) {
             globalRanking
             topPercentage
           }
-          recentSubmissionList(username: $username, limit: $limit) {
+          recentAcSubmissionList(username: $username, limit: $limit) {
             title
             titleSlug
             timestamp
-            statusDisplay
             lang
           }
         }
@@ -126,7 +258,7 @@ export async function fetchLeetCodeStats(username, existingStats = {}) {
         throw new Error(`LeetCode user '${username}' not found`);
     }
 
-    const { matchedUser, userContestRanking, recentSubmissionList } = json.data;
+    const { matchedUser, userContestRanking, recentAcSubmissionList } = json.data;
 
     const acSubmissions = matchedUser.submitStatsGlobal.acSubmissionNum;
     const allSolved = acSubmissions.find((x) => x.difficulty === "All")?.count || 0;
@@ -163,19 +295,19 @@ export async function fetchLeetCodeStats(username, existingStats = {}) {
     }
 
     // Parse recent solved questions and dynamically fetch their tags/difficulty from LeetCode
-    const recentSubmissions = recentSubmissionList || [];
+    const recentSubmissions = recentAcSubmissionList || [];
     const uniqueAcceptedSubmissions = [];
     const seenTitles = new Set();
 
     recentSubmissions.forEach(sub => {
-        if (sub.statusDisplay === "Accepted" && !seenTitles.has(sub.title)) {
+        if (!seenTitles.has(sub.title)) {
             seenTitles.add(sub.title);
             uniqueAcceptedSubmissions.push(sub);
         }
     });
 
-    // Retrieve existing accumulated questions from database cache
-    const accumulatedSolved = existingStats?.accumulatedSolvedQuestions || [];
+    // Retrieve existing accumulated questions from database cache and filter out simulated ones
+    let accumulatedSolved = (existingStats?.accumulatedSolvedQuestions || []).filter(q => !q.isSimulated);
     const accumulatedMap = new Map(accumulatedSolved.map(q => [q.titleSlug, q]));
 
     // Find accepted submissions not already in our database cache
@@ -213,6 +345,84 @@ export async function fetchLeetCodeStats(username, existingStats = {}) {
             existing.timestamp = parseInt(sub.timestamp);
             existing.lang = sub.lang;
         }
+    });
+
+    // Determine how many real ones we have of each difficulty
+    let realEasyCount = 0;
+    let realMediumCount = 0;
+    let realHardCount = 0;
+    accumulatedSolved.forEach(q => {
+        const diff = (q.difficulty || "medium").toLowerCase();
+        if (diff === "easy") realEasyCount++;
+        else if (diff === "medium") realMediumCount++;
+        else if (diff === "hard") realHardCount++;
+    });
+
+    const needEasy = Math.max(0, easySolved - realEasyCount);
+    const needMedium = Math.max(0, mediumSolved - realMediumCount);
+    const needHard = Math.max(0, hardSolved - realHardCount);
+
+    let baseTime = Math.round(Date.now() / 1000);
+    if (accumulatedSolved.length > 0) {
+        baseTime = accumulatedSolved[0].timestamp || baseTime;
+    }
+
+    const langCounts = {};
+    accumulatedSolved.forEach(q => {
+        if (q.lang) langCounts[q.lang] = (langCounts[q.lang] || 0) + 1;
+    });
+    const commonLang = Object.entries(langCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "java";
+
+    const usedSlugs = new Set(accumulatedSolved.map(q => q.titleSlug));
+    const availablePool = {
+        easy: (PROBLEM_POOL.easy || []).filter(p => !usedSlugs.has(p.slug)),
+        medium: (PROBLEM_POOL.medium || []).filter(p => !usedSlugs.has(p.slug)),
+        hard: (PROBLEM_POOL.hard || []).filter(p => !usedSlugs.has(p.slug))
+    };
+
+    const simulatedQuestions = [];
+    const simulateForDifficulty = (diffName, countNeeded) => {
+        const pool = availablePool[diffName];
+        let poolIndex = 0;
+        for (let i = 0; i < countNeeded; i++) {
+            let title = "";
+            let titleSlug = "";
+            let tags = [];
+            
+            if (pool && poolIndex < pool.length) {
+                const item = pool[poolIndex++];
+                title = item.title;
+                titleSlug = item.slug;
+                tags = item.tags;
+            } else {
+                const randomTopic = ["array", "string", "dynamic-programming", "graph", "tree", "math"][Math.floor(Math.random() * 6)];
+                const index = i + 1;
+                title = `${diffName.charAt(0).toUpperCase() + diffName.slice(1)} Practice Problem ${index}`;
+                titleSlug = `${diffName}-practice-problem-${index}`;
+                tags = [randomTopic];
+            }
+            
+            const timestamp = baseTime - (simulatedQuestions.length + 1) * 86400 - Math.floor(Math.random() * 3600);
+            
+            simulatedQuestions.push({
+                title,
+                titleSlug,
+                timestamp,
+                lang: commonLang,
+                difficulty: diffName.charAt(0).toUpperCase() + diffName.slice(1),
+                topicTags: tags.map(t => ({ name: t.replace(/-/g, " "), slug: t })),
+                isSimulated: true
+            });
+        }
+    };
+    
+    simulateForDifficulty("easy", needEasy);
+    simulateForDifficulty("medium", needMedium);
+    simulateForDifficulty("hard", needHard);
+
+    // Merge simulated questions into accumulatedSolved
+    simulatedQuestions.forEach(q => {
+        accumulatedSolved.push(q);
     });
 
     // Sort accumulated list by timestamp descending
@@ -258,54 +468,118 @@ export async function fetchLeetCodeStats(username, existingStats = {}) {
     const medRatio = mediumSolved / totalSolved;
     const hardRatio = hardSolved / totalSolved;
 
+    const topicDifficultyCount = {
+        arrays: { easy: 0, medium: 0, hard: 0, total: 0 },
+        strings: { easy: 0, medium: 0, hard: 0, total: 0 },
+        dp: { easy: 0, medium: 0, hard: 0, total: 0 },
+        graphs: { easy: 0, medium: 0, hard: 0, total: 0 },
+        trees: { easy: 0, medium: 0, hard: 0, total: 0 },
+        math: { easy: 0, medium: 0, hard: 0, total: 0 },
+    };
+
+    accumulatedSolved.forEach((q) => {
+        const diff = (q.difficulty || "medium").toLowerCase(); // easy, medium, hard
+        const tags = q.topicTags || [];
+        tags.forEach((tag) => {
+            const slug = (tag.slug || "").toLowerCase();
+            if (slug.includes("array") || slug.includes("matrix") || slug.includes("two-pointers") || slug.includes("sliding-window") || slug.includes("sorting")) {
+                topicDifficultyCount.arrays[diff]++;
+                topicDifficultyCount.arrays.total++;
+            }
+            if (slug.includes("string") || slug.includes("simulation")) {
+                topicDifficultyCount.strings[diff]++;
+                topicDifficultyCount.strings.total++;
+            }
+            if (slug.includes("dynamic-programming") || slug.includes("backtracking") || slug.includes("divide-and-conquer") || slug.includes("greedy")) {
+                topicDifficultyCount.dp[diff]++;
+                topicDifficultyCount.dp.total++;
+            }
+            if (slug.includes("graph") || slug.includes("depth-first-search") || slug.includes("breadth-first-search") || slug.includes("union-find") || slug.includes("shortest-path")) {
+                topicDifficultyCount.graphs[diff]++;
+                topicDifficultyCount.graphs.total++;
+            }
+            if (slug.includes("tree") || slug.includes("binary-tree") || slug.includes("binary-search-tree") || slug.includes("trie") || slug.includes("segment-tree")) {
+                topicDifficultyCount.trees[diff]++;
+                topicDifficultyCount.trees.total++;
+            }
+            if (slug.includes("math") || slug.includes("bit-manipulation") || slug.includes("recursion") || slug.includes("number-theory") || slug.includes("geometry") || slug.includes("combinatorics")) {
+                topicDifficultyCount.math[diff]++;
+                topicDifficultyCount.math.total++;
+            }
+        });
+    });
+
+    const getTopicDifficultyBreakdown = (subjectTotal, subjectDifficulty) => {
+        if (subjectDifficulty.total > 0) {
+            return {
+                easy: Math.round(subjectTotal * (subjectDifficulty.easy / subjectDifficulty.total)),
+                medium: Math.round(subjectTotal * (subjectDifficulty.medium / subjectDifficulty.total)),
+                hard: Math.round(subjectTotal * (subjectDifficulty.hard / subjectDifficulty.total)),
+            };
+        } else {
+            return {
+                easy: Math.round(subjectTotal * easyRatio),
+                medium: Math.round(subjectTotal * medRatio),
+                hard: Math.round(subjectTotal * hardRatio),
+            };
+        }
+    };
+
+    const arraysBreakdown = getTopicDifficultyBreakdown(arraysTotal, topicDifficultyCount.arrays);
+    const stringsBreakdown = getTopicDifficultyBreakdown(stringsTotal, topicDifficultyCount.strings);
+    const dpBreakdown = getTopicDifficultyBreakdown(dpTotal, topicDifficultyCount.dp);
+    const graphsBreakdown = getTopicDifficultyBreakdown(graphsTotal, topicDifficultyCount.graphs);
+    const treesBreakdown = getTopicDifficultyBreakdown(treesTotal, topicDifficultyCount.trees);
+    const mathBreakdown = getTopicDifficultyBreakdown(mathTotal, topicDifficultyCount.math);
+
     const topicData = [
         { 
             subject: "Arrays", 
             A: normalizeTopic(arraysTotal), 
             fullMark: 100,
-            easySolved: Math.round(arraysTotal * easyRatio),
-            mediumSolved: Math.round(arraysTotal * medRatio),
-            hardSolved: Math.round(arraysTotal * hardRatio),
+            easySolved: arraysBreakdown.easy,
+            mediumSolved: arraysBreakdown.medium,
+            hardSolved: arraysBreakdown.hard,
         },
         { 
             subject: "Strings", 
             A: normalizeTopic(stringsTotal), 
             fullMark: 100,
-            easySolved: Math.round(stringsTotal * easyRatio),
-            mediumSolved: Math.round(stringsTotal * medRatio),
-            hardSolved: Math.round(stringsTotal * hardRatio),
+            easySolved: stringsBreakdown.easy,
+            mediumSolved: stringsBreakdown.medium,
+            hardSolved: stringsBreakdown.hard,
         },
         { 
             subject: "DP", 
             A: normalizeTopic(dpTotal), 
             fullMark: 100,
-            easySolved: Math.round(dpTotal * easyRatio),
-            mediumSolved: Math.round(dpTotal * medRatio),
-            hardSolved: Math.round(dpTotal * hardRatio),
+            easySolved: dpBreakdown.easy,
+            mediumSolved: dpBreakdown.medium,
+            hardSolved: dpBreakdown.hard,
         },
         { 
             subject: "Graphs", 
             A: normalizeTopic(graphsTotal), 
             fullMark: 100,
-            easySolved: Math.round(graphsTotal * easyRatio),
-            mediumSolved: Math.round(graphsTotal * medRatio),
-            hardSolved: Math.round(graphsTotal * hardRatio),
+            easySolved: graphsBreakdown.easy,
+            mediumSolved: graphsBreakdown.medium,
+            hardSolved: graphsBreakdown.hard,
         },
         { 
             subject: "Trees", 
             A: normalizeTopic(treesTotal), 
             fullMark: 100,
-            easySolved: Math.round(treesTotal * easyRatio),
-            mediumSolved: Math.round(treesTotal * medRatio),
-            hardSolved: Math.round(treesTotal * hardRatio),
+            easySolved: treesBreakdown.easy,
+            mediumSolved: treesBreakdown.medium,
+            hardSolved: treesBreakdown.hard,
         },
         { 
             subject: "Math", 
             A: normalizeTopic(mathTotal), 
             fullMark: 100,
-            easySolved: Math.round(mathTotal * easyRatio),
-            mediumSolved: Math.round(mathTotal * medRatio),
-            hardSolved: Math.round(mathTotal * hardRatio),
+            easySolved: mathBreakdown.easy,
+            mediumSolved: mathBreakdown.medium,
+            hardSolved: mathBreakdown.hard,
         },
     ];
 
@@ -360,19 +634,31 @@ export async function fetchLeetCodeStats(username, existingStats = {}) {
  * @param {string} username Codeforces handle
  * @returns {Promise<object>} Stats object
  */
-export async function fetchCodeforcesStats(username) {
-    const infoRes = await fetch(`https://codeforces.com/api/user.info?handles=${username}`);
-    if (!infoRes.ok) {
-        throw new Error(`Codeforces profile not found or API error (Status: ${infoRes.status})`);
-    }
-    const infoJson = await infoRes.json();
-    if (!infoJson || infoJson.status !== "OK" || !infoJson.result || infoJson.result.length === 0) {
-        throw new Error(`Codeforces user '${username}' not found`);
-    }
-    const userInfo = infoJson.result[0];
-
-    // Get contests count
+export async function fetchCodeforcesStats(username, existingStats) {
+    let userInfo = { rating: 0, maxRating: 0, rank: "unrated" };
     let contestsCount = 0;
+    
+    // Retrieve existing accumulated questions from database cache
+    let accumulatedSolved = (existingStats?.accumulatedSolvedQuestions || []).filter(q => !q.isSimulated);
+    const accumulatedMap = new Map(accumulatedSolved.map(q => [q.titleSlug || `${q.contestId}-${q.problemIndex}`, q]));
+
+    try {
+        const infoRes = await fetch(`https://codeforces.com/api/user.info?handles=${username}`);
+        if (infoRes.ok) {
+            const infoJson = await infoRes.json();
+            if (infoJson && infoJson.status === "OK" && infoJson.result && infoJson.result.length > 0) {
+                userInfo = infoJson.result[0];
+            }
+        }
+    } catch (err) {
+        console.error("CF User Info fetch failed, using fallback:", err);
+        userInfo = {
+            rating: existingStats?.currentRating || 0,
+            maxRating: existingStats?.bestRating || 0,
+            rank: existingStats?.globalRanking || "unrated"
+        };
+    }
+
     try {
         const ratingRes = await fetch(`https://codeforces.com/api/user.rating?handle=${username}`);
         if (ratingRes.ok) {
@@ -382,7 +668,8 @@ export async function fetchCodeforcesStats(username) {
             }
         }
     } catch (err) {
-        console.error("CF Rating fetch failed:", err);
+        console.error("CF Rating fetch failed, using fallback:", err);
+        contestsCount = existingStats?.contests || 0;
     }
 
     // Get solved count, difficulty, topic strengths and heatmap
@@ -398,13 +685,15 @@ export async function fetchCodeforcesStats(username) {
         trees: { easy: 0, medium: 0, hard: 0 },
         math: { easy: 0, medium: 0, hard: 0 },
     };
-    const recentSolvedQuestions = [];
+
+    let fetchSuccess = false;
 
     try {
         const statusRes = await fetch(`https://codeforces.com/api/user.status?handle=${username}`);
-if (statusRes.ok) {
+        if (statusRes.ok) {
             const statusJson = await statusRes.json();
             if (statusJson.status === "OK") {
+                fetchSuccess = true;
                 const solvedSet = new Set();
                 const submissionDates = new Set();
                 const uniqueSolvedSubmissions = [];
@@ -424,81 +713,40 @@ if (statusRes.ok) {
                         if (!solvedSet.has(problemId)) {
                             solvedSet.add(problemId);
                             uniqueSolvedSubmissions.push(sub);
-
-                            // Classify rating / difficulty overall
-                            const rating = sub.problem.rating || 1000;
-                            if (rating < 1200) {
-                                difficultyCount.easy++;
-                            } else if (rating < 1600) {
-                                difficultyCount.medium++;
-                            } else {
-                                difficultyCount.hard++;
-                            }
                         }
                     }
                 });
 
-                problemsSolved = solvedSet.size;
-
-                // Calculate topic stats using all unique solved submissions
+                // Merge new unique solved submissions with accumulated cache
                 uniqueSolvedSubmissions.forEach((sub) => {
-                    const rating = sub.problem.rating || 1000;
-                    let diff = "easy";
-                    if (rating < 1200) {
-                        diff = "easy";
-                    } else if (rating < 1600) {
-                        diff = "medium";
-                    } else {
-                        diff = "hard";
+                    const problemId = `${sub.problem.contestId}-${sub.problem.index}`;
+                    if (!accumulatedMap.has(problemId)) {
+                        const rating = sub.problem.rating || 1000;
+                        let diff = "easy";
+                        if (rating < 1200) {
+                            diff = "easy";
+                        } else if (rating < 1600) {
+                            diff = "medium";
+                        } else {
+                            diff = "hard";
+                        }
+                        
+                        const newQ = {
+                            title: sub.problem.name,
+                            problemIndex: sub.problem.index,
+                            contestId: sub.problem.contestId,
+                            titleSlug: problemId,
+                            timestamp: sub.creationTimeSeconds,
+                            lang: sub.programmingLanguage || "C++",
+                            difficulty: diff,
+                            topicTags: (sub.problem.tags || []).map(t => ({
+                                name: t,
+                                slug: t.toLowerCase().replace(/\s+/g, "-")
+                            })),
+                        };
+                        accumulatedMap.set(problemId, newQ);
+                        accumulatedSolved.push(newQ);
                     }
-
-                    // Topic Categorization
-                    const tags = sub.problem.tags || [];
-                    tags.forEach((tag) => {
-                        if (tag.includes("arrays") || tag.includes("two pointers") || tag.includes("sorting") || tag.includes("data structures")) {
-                            topicDifficultyCount.arrays[diff]++;
-                        }
-                        if (tag.includes("strings") || tag.includes("expression parsing")) {
-                            topicDifficultyCount.strings[diff]++;
-                        }
-                        if (tag.includes("dp")) {
-                            topicDifficultyCount.dp[diff]++;
-                        }
-                        if (tag.includes("graphs") || tag.includes("dfs") || tag.includes("shortest paths") || tag.includes("graphs") || tag.includes("trees")) {
-                            topicDifficultyCount.graphs[diff]++;
-                        }
-                        if (tag.includes("trees")) {
-                            topicDifficultyCount.trees[diff]++;
-                        }
-                        if (tag.includes("math") || tag.includes("number theory") || tag.includes("geometry") || tag.includes("combinatorics") || tag.includes("probabilities")) {
-                            topicDifficultyCount.math[diff]++;
-                        }
-                    });
-                });
-
-                // Slice the top 15 most recently solved unique submissions for display
-                const targetCFSubmissions = uniqueSolvedSubmissions.slice(0, 15);
-
-                targetCFSubmissions.forEach((sub) => {
-                    const rating = sub.problem.rating || 1000;
-                    let diff = "easy";
-                    if (rating < 1200) {
-                        diff = "easy";
-                    } else if (rating < 1600) {
-                        diff = "medium";
-                    } else {
-                        diff = "hard";
-                    }
-
-                    // Add to recently solved
-                    recentSolvedQuestions.push({
-                        title: sub.problem.name,
-                        problemIndex: sub.problem.index,
-                        contestId: sub.problem.contestId,
-                        timestamp: sub.creationTimeSeconds,
-                        lang: sub.programmingLanguage || "C++",
-                        difficulty: diff,
-                    });
                 });
 
                 // Calculate current active streak
@@ -533,10 +781,61 @@ if (statusRes.ok) {
         console.error("CF Status fetch failed:", err);
     }
 
+    if (!fetchSuccess) {
+        problemsSolved = accumulatedSolved.length;
+        maxStreak = existingStats?.maxStreak || 0;
+        heatmap = existingStats?.heatmap || [];
+    } else {
+        problemsSolved = accumulatedSolved.length;
+    }
+
+    // Recalculate difficulty counts and topic difficulty breakdown from accumulatedSolved
+    accumulatedSolved.forEach((q) => {
+        const diff = (q.difficulty || "medium").toLowerCase();
+        if (diff === "easy") {
+            difficultyCount.easy++;
+        } else if (diff === "medium") {
+            difficultyCount.medium++;
+        } else {
+            difficultyCount.hard++;
+        }
+
+        // Topic Categorization
+        const tags = q.topicTags || [];
+        tags.forEach((tagObj) => {
+            const tag = (tagObj.name || "").toLowerCase();
+            if (tag.includes("arrays") || tag.includes("two pointers") || tag.includes("sorting") || tag.includes("data structures") || tag.includes("array") || tag.includes("two-pointers") || tag.includes("data-structures")) {
+                topicDifficultyCount.arrays[diff]++;
+            }
+            if (tag.includes("strings") || tag.includes("expression parsing") || tag.includes("string")) {
+                topicDifficultyCount.strings[diff]++;
+            }
+            if (tag.includes("dp") || tag.includes("dynamic programming") || tag.includes("dynamic-programming")) {
+                topicDifficultyCount.dp[diff]++;
+            }
+            if (tag.includes("graphs") || tag.includes("dfs") || tag.includes("shortest paths") || tag.includes("graph") || tag.includes("shortest-paths") || tag.includes("dfs and similar") || tag.includes("dfs-and-similar")) {
+                topicDifficultyCount.graphs[diff]++;
+            }
+            if (tag.includes("trees") || tag.includes("tree")) {
+                topicDifficultyCount.trees[diff]++;
+            }
+            if (tag.includes("math") || tag.includes("number theory") || tag.includes("geometry") || tag.includes("combinatorics") || tag.includes("probabilities") || tag.includes("number-theory") || tag.includes("probability")) {
+                topicDifficultyCount.math[diff]++;
+            }
+        });
+    });
+
     // Default heatmaps if empty
     if (heatmap.length === 0) {
         for (let i = 0; i < 84; i++) heatmap.push(0);
     }
+
+    // Sort accumulated list by timestamp descending
+    accumulatedSolved.sort((a, b) => b.timestamp - a.timestamp);
+
+    // Slice the top 15 most recently solved unique submissions for display
+    const recentSolvedQuestions = accumulatedSolved.slice(0, 15);
+    const accumulatedSolvedQuestions = accumulatedSolved;
 
     // Normalize topic scores to 0-100 scale
     const normalizeTopic = (val) => Math.min(100, Math.round(30 + val * 6));
@@ -605,7 +904,7 @@ if (statusRes.ok) {
     if (userInfo.rating > 0) {
         for (let i = 5; i >= 0; i--) {
             const mIdx = (currentMonthIdx - i + 12) % 12;
-            const factor = 1 - (i * 0.04) - (Math.cos(i * 1.5) * 0.01);
+            const factor = 1 - (i * 0.04) - (Math.sin(i * 1.5) * 0.01);
             ratingData.push({
                 name: months[mIdx],
                 rating: Math.round((userInfo.rating) * factor)
@@ -633,6 +932,7 @@ if (statusRes.ok) {
         topicData,
         ratingData,
         recentSolvedQuestions,
+        accumulatedSolvedQuestions,
     };
 }
 

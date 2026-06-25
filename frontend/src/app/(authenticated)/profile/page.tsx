@@ -450,11 +450,11 @@ export default function Profile() {
               </button>
             </div>
 
-            <div className="flex justify-center overflow-x-auto pb-4">
+            <div className="flex justify-center items-center overflow-hidden h-[200px] min-[380px]:h-[230px] sm:h-[270px] w-full">
               {/* The actual ID card element to capture */}
               <div
                 ref={cardRef}
-                className="w-[400px] h-[250px] bg-paper rough-border p-6 flex flex-col justify-between relative overflow-hidden"
+                className="w-[400px] h-[250px] bg-paper rough-border p-6 flex flex-col justify-between relative overflow-hidden scale-[0.7] min-[380px]:scale-[0.85] sm:scale-100 origin-center shrink-0"
                 style={{
                   backgroundImage: "radial-gradient(#ccc 1px, transparent 1px)",
                   backgroundSize: "20px 20px"

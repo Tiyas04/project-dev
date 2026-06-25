@@ -45,7 +45,6 @@ export function LoggedInNavbar() {
 
   const navLinks = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
-    { name: "Progress", path: "/progress", icon: <TrendingUp size={18} /> },
     { name: "Stats", path: "/stats", icon: <BarChart2 size={18} /> },
     { name: "Analysis", path: "/analysis", icon: <Zap size={18} /> },
   ];

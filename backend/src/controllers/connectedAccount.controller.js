@@ -33,7 +33,9 @@ const connectPlatform = asyncHandler(async (req, res) => {
             const existingStats = existingAccount?.leetcode?.stats;
             stats = await fetchLeetCodeStats(username, existingStats);
         } else if (normalizedPlatform === "codeforces") {
-            stats = await fetchCodeforcesStats(username);
+            const existingAccount = await ConnectedAccount.findOne({ user: req.user._id });
+            const existingStats = existingAccount?.codeforces?.stats;
+            stats = await fetchCodeforcesStats(username, existingStats);
         } else if (normalizedPlatform === "github") {
             stats = await fetchGitHubStats(username);
         }
@@ -139,7 +141,7 @@ const syncAllPlatforms = asyncHandler(async (req, res) => {
                 if (platform === "leetcode") {
                     stats = await fetchLeetCodeStats(username, connectedAccount.leetcode?.stats);
                 } else if (platform === "codeforces") {
-                    stats = await fetchCodeforcesStats(username);
+                    stats = await fetchCodeforcesStats(username, connectedAccount.codeforces?.stats);
                 } else if (platform === "github") {
                     stats = await fetchGitHubStats(username);
                 }
