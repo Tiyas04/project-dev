@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { OAuth2Client } from "google-auth-library";
 import { enrichUser } from "../utils/userEnricher.js";
+import { Follow } from "../models/follow.model.js";
+import { ConnectedAccount } from "../models/connectedAccount.model.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -212,6 +214,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     console.log("user fetched successfully")
     const enrichedUser = await enrichUser(req.user);
+    
+    const followersCount = await Follow.countDocuments({ following: req.user._id });
+    const followingCount = await Follow.countDocuments({ follower: req.user._id });
+    
+    enrichedUser.followersCount = followersCount;
+    enrichedUser.followingCount = followingCount;
+
     return res
         .status(200)
         .json(new ApiResponse(200, enrichedUser, "User fetched successfully"));
@@ -362,6 +371,188 @@ const googleAuth = asyncHandler(async (req, res) => {
     }
 });
 
+const getPublicProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+
+    if (!username) {
+        throw new ApiError(400, "Username is required");
+    }
+
+    const user = await User.findOne({ username: username.toLowerCase() });
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const enrichedUser = await enrichUser(user);
+
+    // Get followers and following counts
+    const followersCount = await Follow.countDocuments({ following: user._id });
+    const followingCount = await Follow.countDocuments({ follower: user._id });
+
+    // Check if the requesting user is following this user
+    let isFollowing = false;
+    if (req.user) {
+        isFollowing = await Follow.exists({
+            follower: req.user._id,
+            following: user._id
+        }) ? true : false;
+    }
+
+    enrichedUser.followersCount = followersCount;
+    enrichedUser.followingCount = followingCount;
+    enrichedUser.isFollowing = isFollowing;
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, enrichedUser, "Public profile fetched successfully"));
+});
+
+const followUser = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+
+    if (!username) {
+        throw new ApiError(400, "Username is required");
+    }
+
+    const userToFollow = await User.findOne({ username: username.toLowerCase() });
+    if (!userToFollow) {
+        throw new ApiError(404, "User to follow not found");
+    }
+
+    if (userToFollow._id.toString() === req.user._id.toString()) {
+        throw new ApiError(400, "You cannot follow yourself");
+    }
+
+    // Check if already following
+    const isAlreadyFollowing = await Follow.findOne({
+        follower: req.user._id,
+        following: userToFollow._id
+    });
+
+    if (isAlreadyFollowing) {
+        throw new ApiError(400, "You are already following this user");
+    }
+
+    await Follow.create({
+        follower: req.user._id,
+        following: userToFollow._id
+    });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Successfully followed user"));
+});
+
+const unfollowUser = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+
+    if (!username) {
+        throw new ApiError(400, "Username is required");
+    }
+
+    const userToUnfollow = await User.findOne({ username: username.toLowerCase() });
+    if (!userToUnfollow) {
+        throw new ApiError(404, "User to unfollow not found");
+    }
+
+    const deleteResult = await Follow.deleteOne({
+        follower: req.user._id,
+        following: userToUnfollow._id
+    });
+
+    if (deleteResult.deletedCount === 0) {
+        throw new ApiError(400, "You are not following this user");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Successfully unfollowed user"));
+});
+
+const searchUsers = asyncHandler(async (req, res) => {
+    const { q } = req.query;
+
+    if (!q || !q.trim()) {
+        return res.status(200).json(new ApiResponse(200, [], "Empty search query"));
+    }
+
+    const queryStr = q.trim().toLowerCase();
+
+    // Find users where username starts with the query prefix
+    const users = await User.find({
+        username: { $regex: new RegExp("^" + queryStr) }
+    }).select("name username avatar");
+
+    // Fetch details for each matched user: followersCount and platform connections
+    const results = await Promise.all(
+        users.map(async (u) => {
+            const followersCount = await Follow.countDocuments({ following: u._id });
+            const connectedAccount = await ConnectedAccount.findOne({ user: u._id });
+
+            return {
+                name: u.name,
+                username: u.username,
+                avatar: u.avatar,
+                followersCount,
+                leetcode: !!connectedAccount?.leetcode?.username,
+                codeforces: !!connectedAccount?.codeforces?.username,
+                github: !!connectedAccount?.github?.username,
+            };
+        })
+    );
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, results, "Users searched successfully"));
+});
+
+const getFollowersList = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+
+    if (!username) {
+        throw new ApiError(400, "Username is required");
+    }
+
+    const user = await User.findOne({ username: username.toLowerCase() });
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const follows = await Follow.find({ following: user._id })
+        .populate("follower", "name username avatar")
+        .select("follower");
+
+    const followers = follows.map(f => f.follower).filter(Boolean);
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, followers, "Followers list fetched successfully"));
+});
+
+const getFollowingList = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+
+    if (!username) {
+        throw new ApiError(400, "Username is required");
+    }
+
+    const user = await User.findOne({ username: username.toLowerCase() });
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const follows = await Follow.find({ follower: user._id })
+        .populate("following", "name username avatar")
+        .select("following");
+
+    const following = follows.map(f => f.following).filter(Boolean);
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, following, "Following list fetched successfully"));
+});
+
 export {
     registerUser,
     loginUser,
@@ -370,5 +561,11 @@ export {
     getCurrentUser,
     updateAccountDetails,
     updateUserAvatar,
-    googleAuth
+    googleAuth,
+    getPublicProfile,
+    followUser,
+    unfollowUser,
+    searchUsers,
+    getFollowersList,
+    getFollowingList
 }

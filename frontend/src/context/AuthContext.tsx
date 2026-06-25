@@ -11,6 +11,8 @@ export interface User {
   name: string;
   avatar: string;
   coverImage?: string;
+  followersCount?: number;
+  followingCount?: number;
   leetcode?: string;
   codeforces?: string;
   github?: string;
