@@ -220,12 +220,12 @@ Implemented achievement visualizations:
 * [x] Custom User Slugs / Handles
 * [x] Shareable Profile Links & Copy Buttons
 * [x] Public Statistics View (Recharts rating curves, diff charts, heatmaps, recent solves)
-* [x] Scannable Profile QR Code inside Coder Card
+* [x] Client-side generated Scannable Profile QR Code inside Coder Card using `next-qrcode`
 * [x] Follow/Follower Social System (uniquely index relationships)
 * [x] Followers and Following lists API endpoints (`/profile/:username/followers` and `/profile/:username/following`)
 * [x] Reusable sketch-styled `FollowersModal` overlay component
 * [x] Integrated follower/following details modal on profile settings page and public profiles
-* [x] Fixed Coder Card export cropping and CORS image tainting for seamless PNG downloads
+* [x] Fixed Coder Card export cropping, CORS image tainting, and dimension overflow for seamless PNG downloads
 
 ---
 
@@ -258,7 +258,7 @@ Implemented achievement visualizations:
 
 # Immediate Development Priorities
 
-## Priority 1 — Unified Competitive Programming Arena Score
+## Priority 1 — Unified Competitive Programming Arena Score (Phase 5)
 
 Formulate a custom algorithm to calculate the unified CP performance score across connected platforms (LeetCode, Codeforces).
 
@@ -271,28 +271,28 @@ Tasks:
 
 ---
 
-## Priority 2 — Public User Profiles
+## Priority 2 — Social Features & Leaderboards (Phase 6)
 
-Implement shareable public profiles for developers to showcase their stats.
-
-Targets:
-
-* Create backend routes for `/api/users/:username/profile`
-* Build dynamic, public-facing frontend routes `/user/[username]`
-* Render Radar Charts, badges, solved statistics, and recent activity for guest users
-* Implement metadata tags for social media preview cards
-
----
-
-## Priority 3 — Background Sync Automation (Queue Setup)
-
-Automate platform data updates behind the scenes to avoid user wait times during dashboard navigation.
+Build out the social and community aspects of DevArena to encourage healthy competition and collaboration.
 
 Tasks:
 
-* Setup Redis connection and BullMQ processing pipeline
-* Create worker process for automated account synchronization
-* Add daily cron trigger for updates
+* Implement user search functionality
+* Build friend request workflows (send, accept, decline)
+* Create community leaderboards based on Arena Score and platform metrics
+* Design a friend activity feed for recent solves and rating changes
+
+---
+
+## Priority 3 — AI Features & Personalization (Phase 8)
+
+Integrate the Gemini API to provide intelligent, tailored feedback to developers to accelerate their growth.
+
+Tasks:
+
+* Build an AI Coach interface for personalized learning roadmaps
+* Create a Problem Recommendation engine based on weak topics
+* Generate automated contest reviews and performance insights
 
 ---
 
@@ -339,12 +339,12 @@ MongoDB
 
 # Next Major Milestone
 
-🎯 Goal: Implement Unified Arena Score & Shareable Public Profiles (Phase 5 & Phase 7)
+🎯 Goal: Implement Unified Arena Score, Social Interactivity, & AI Coaching (Phases 5, 6, & 8)
 
 Expected Deliverables:
 
 * Combined developer metrics score calculation (Arena Score)
-* Public-facing user profile pages (`/user/[username]`)
-* SEO preview-ready profiles for developer portfolios
+* Community leaderboards and friend activity feeds
+* Gemini API integration for AI-powered learning roadmaps and problem recommendations
 
-This milestone will expand DevArena from a private personal dashboard into a public-facing developer showcase and portfolio utility.
+This milestone will transform DevArena from an individual tracking dashboard into an engaging, socially interactive, and intelligently guided platform for competitive programming growth.
