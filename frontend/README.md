@@ -1,8 +1,8 @@
 # 💻 DevArena - Frontend Web App
 
 [![React](https://img.shields.io/badge/React-19.x-blue.svg)](https://react.dev/)
-[![Next.js](https://img.shields.io/badge/Next.js-15.x-black.svg)](https://nextjs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC.svg)](https://tailwindcss.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.x-black.svg)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.x-38B2AC.svg)](https://tailwindcss.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 
 Welcome to the frontend web application for **DevArena**. This is a modern, responsive, and interactive dashboard built using Next.js (App Router) and Tailwind CSS, featuring beautiful data visualizations and micro-animations.
@@ -17,7 +17,7 @@ Welcome to the frontend web application for **DevArena**. This is a modern, resp
   - Growth line graphs showing rating history over time.
   - Badges displaying difficulty ratios.
   - Activity grids showing submissions heatmaps.
-- **🔐 Protected Navigation & Session Routing:** Authentication middleware and custom contexts that prevent unauthenticated users from visiting dashboard pages.
+- **🔐 Protected Navigation & Session Routing:** Authentication proxy and custom contexts that prevent unauthenticated users from visiting dashboard pages.
 - **🎨 Glassmorphic Dark UI:** Sleek, high-contrast dark theme utilizing Framer Motion for smooth tab switches, modal openings, and hover indicators.
 - **📁 Avatar & Profile Uploader:** Integrated avatar profile changes featuring custom file uploads and image conversions.
 
