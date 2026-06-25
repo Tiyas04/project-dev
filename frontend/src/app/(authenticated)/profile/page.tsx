@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { User, Mail, Link as LinkIcon, Code2, Camera, Download, QrCode, Trash2 } from "lucide-react";
 import { toPng } from "html-to-image";
 import { useAuth } from "@/context/AuthContext";
+import { FollowersModal } from "@/components/followers-modal";
 
 export default function Profile() {
   const { user, updateAvatar, updateProfile, connectPlatform, disconnectPlatform } = useAuth();
@@ -13,6 +14,7 @@ export default function Profile() {
   const [email, setEmail] = useState(user?.email || "");
   const [issueDate, setIssueDate] = useState("");
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -25,6 +27,14 @@ export default function Profile() {
   const [isConnecting, setIsConnecting] = useState<Record<string, boolean>>({});
   const [isDisconnecting, setIsDisconnecting] = useState<Record<string, boolean>>({});
   const [connectionError, setConnectionError] = useState<Record<string, string>>({});
+
+  // Follower/Following modal states
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"followers" | "following">("followers");
+
+  // Data URLs for card capture to bypass CORS taint
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  const [avatarDataUrl, setAvatarDataUrl] = useState<string>("");
 
   const hasConnections = !!(user?.leetcode || user?.codeforces || user?.github);
   const connectedPlatformsCount = [user?.leetcode, user?.codeforces, user?.github].filter(Boolean).length;
@@ -44,6 +54,48 @@ export default function Profile() {
       setEmail(user.email);
     }
   }, [user]);
+
+  // Fetch QR Code as Base64 to prevent canvas taint during download
+  useEffect(() => {
+    if (typeof window !== "undefined" && user?.username) {
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}/user/${user.username}`)}`;
+      fetch(qrUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setQrCodeDataUrl(reader.result as string);
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(err => {
+          console.error("Failed to load QR code as Data URL:", err);
+          setQrCodeDataUrl(qrUrl);
+        });
+    }
+  }, [user?.username]);
+
+  // Fetch Avatar as Base64 to prevent canvas taint during download
+  useEffect(() => {
+    if (user?.avatar && user.avatar !== "https://cdn-icons-png.flaticon.com/512/5951/5951752.png") {
+      const imgUrl = user.avatar.replace("http://", "https://");
+      fetch(imgUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setAvatarDataUrl(reader.result as string);
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(err => {
+          console.error("Failed to load avatar as Data URL:", err);
+          setAvatarDataUrl(imgUrl);
+        });
+    } else {
+      setAvatarDataUrl("");
+    }
+  }, [user?.avatar]);
 
   const handleConnect = async (platform: "leetcode" | "codeforces" | "github", usernameVal: string) => {
     if (!usernameVal.trim()) return;
@@ -188,7 +240,45 @@ export default function Profile() {
               <input type="file" ref={fileInputRef} onChange={handleAvatarChange} className="hidden" accept="image/*" />
             </div>
             <h2 className="font-mono text-xl font-bold text-sketch-black">{name || "Coder"}</h2>
-            <p className="font-mono text-sm text-sketch-black/60">@{username || "user"}</p>
+            <p className="font-mono text-sm text-sketch-black/60 mb-2">@{username || "user"}</p>
+            
+            {/* Clickable followers and following stats */}
+            <div className="flex gap-3 font-mono text-xs font-bold mb-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setModalType("followers");
+                  setModalOpen(true);
+                }}
+                className="flex items-center gap-1 bg-paper border border-sketch-black/10 px-2 py-1 rounded shadow-sm hover:border-blueprint-blue hover:text-blueprint-blue transition-colors cursor-pointer"
+              >
+                Followers: <span className="text-blueprint-blue">{user?.followersCount ?? 0}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalType("following");
+                  setModalOpen(true);
+                }}
+                className="flex items-center gap-1 bg-paper border border-sketch-black/10 px-2 py-1 rounded shadow-sm hover:border-blueprint-blue hover:text-blueprint-blue transition-colors cursor-pointer"
+              >
+                Following: <span className="text-blueprint-blue">{user?.followingCount ?? 0}</span>
+              </button>
+            </div>
+            
+            {/* Share Profile button */}
+            <button
+              onClick={() => {
+                const profileUrl = `${window.location.origin}/user/${username}`;
+                navigator.clipboard.writeText(profileUrl);
+                setShareCopied(true);
+                setTimeout(() => setShareCopied(false), 2000);
+              }}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-sketch-black bg-blueprint-blue hover:bg-blue-900 text-white font-mono text-xs font-bold shadow-[2px_2px_0px_#171717] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all cursor-pointer"
+            >
+              <LinkIcon size={14} />
+              {shareCopied ? "Copied!" : "Share Profile"}
+            </button>
           </div>
 
           <div className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717]">
@@ -451,39 +541,47 @@ export default function Profile() {
             </div>
 
             <div className="flex justify-center items-center overflow-hidden h-[200px] min-[380px]:h-[230px] sm:h-[270px] w-full">
-              {/* The actual ID card element to capture */}
-              <div
-                ref={cardRef}
-                className="w-[400px] h-[250px] bg-paper rough-border p-6 flex flex-col justify-between relative overflow-hidden scale-[0.7] min-[380px]:scale-[0.85] sm:scale-100 origin-center shrink-0"
-                style={{
-                  backgroundImage: "radial-gradient(#ccc 1px, transparent 1px)",
-                  backgroundSize: "20px 20px"
-                }}
-              >
-                {/* Decorative top bar */}
-                <div className="absolute top-0 left-0 w-full h-4 bg-blueprint-blue" />
+              {/* Scale wrapper so html-to-image captures unscaled bounds */}
+              <div className="scale-[0.7] min-[380px]:scale-[0.85] sm:scale-100 origin-center shrink-0">
+                {/* The actual ID card element to capture */}
+                <div
+                  ref={cardRef}
+                  className="w-[400px] h-[250px] bg-paper rough-border p-6 flex flex-col justify-between relative overflow-hidden text-left"
+                  style={{
+                    backgroundImage: "radial-gradient(#ccc 1px, transparent 1px)",
+                    backgroundSize: "20px 20px"
+                  }}
+                >
+                  {/* Decorative top bar */}
+                  <div className="absolute top-0 left-0 w-full h-4 bg-blueprint-blue" />
 
-                <div className="flex justify-between items-start mt-2">
-                  <div>
-                    <h2 className="font-sketch text-3xl text-sketch-black uppercase leading-none tracking-wide">{name || "Coder"}</h2>
-                    <p className="font-mono text-xs font-bold text-blueprint-blue mt-1">@{username || "user"} // ELITE CODER</p>
+                  <div className="flex justify-between items-start mt-2">
+                    <div>
+                      <h2 className="font-sketch text-3xl text-sketch-black uppercase leading-none tracking-wide">{name || "Coder"}</h2>
+                      <p className="font-mono text-xs font-bold text-blueprint-blue mt-1">@{username || "user"} // ELITE CODER</p>
+                    </div>
+                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-sketch-black overflow-hidden bg-white shrink-0 shadow-sm flex items-center justify-center">
+                      {avatarDataUrl ? (
+                        <img
+                          src={avatarDataUrl}
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : user?.avatar && user.avatar !== "https://cdn-icons-png.flaticon.com/512/5951/5951752.png" ? (
+                        <img
+                          src={user.avatar.replace("http://", "https://")}
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                          crossOrigin="anonymous"
+                        />
+                      ) : (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-sketch-black/30">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                      )}
+                    </div>
                   </div>
-                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-sketch-black overflow-hidden bg-white shrink-0 shadow-sm flex items-center justify-center">
-                    {user?.avatar && user.avatar !== "https://cdn-icons-png.flaticon.com/512/5951/5951752.png" ? (
-                      <img
-                        src={user.avatar.replace("http://", "https://")}
-                        alt="Avatar"
-                        className="w-full h-full object-cover"
-                        crossOrigin="anonymous"
-                      />
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-sketch-black/30">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
 
                 {!hasConnections ? (
                   <div className="bg-white/50 p-4 border-2 border-dashed border-sketch-black/20 flex items-center justify-center my-4 h-[56px] w-full">
@@ -521,13 +619,30 @@ export default function Profile() {
 
                 <div className="flex justify-between items-end border-t-2 border-sketch-black pt-2">
                   <p className="font-mono text-[10px] font-bold text-sketch-black/80">ISSUED: {issueDate || "..."}</p>
-                  <QrCode size={32} className="text-sketch-black" />
+                  <div className="w-10 h-10 border-2 border-sketch-black bg-white flex items-center justify-center p-0.5 overflow-hidden shrink-0">
+                    {qrCodeDataUrl ? (
+                      <img
+                        src={qrCodeDataUrl}
+                        alt="Profile QR"
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 animate-pulse" />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      </div>
+      <FollowersModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        username={user?.username || username}
+        type={modalType}
+      />
     </div>
   );
 }

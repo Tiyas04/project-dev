@@ -3,15 +3,26 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { usePathname } from "next/navigation";
-import { User, LogOut, LayoutDashboard, BarChart2, Menu, X, TrendingUp, Zap } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { User, LogOut, LayoutDashboard, BarChart2, Menu, X, TrendingUp, Zap, Search } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export function LoggedInNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setIsMobileMenuOpen(false);
+    }
+  };
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -57,6 +68,20 @@ export function LoggedInNavbar() {
           <Link href="/dashboard" className="w-10 h-10 bg-blueprint-blue text-white flex items-center justify-center font-sketch text-2xl rough-border-blue transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
             DA
           </Link>
+          
+          {/* Search bar in logged-in navbar */}
+          <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center border-2 border-sketch-black bg-white px-2 py-1 select-none relative max-w-[180px] md:max-w-[220px] w-full ml-4 shadow-[2px_2px_0px_#171717]">
+            <input
+              type="text"
+              placeholder="Search username..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full font-mono text-xs focus:outline-none bg-transparent text-sketch-black"
+            />
+            <button type="submit" className="text-sketch-black hover:text-blueprint-blue transition-colors cursor-pointer">
+              <Search size={14} />
+            </button>
+          </form>
         </div>
         
         {/* Middle: Links */}
@@ -158,6 +183,20 @@ export function LoggedInNavbar() {
             className="fixed inset-0 top-[74px] z-40 bg-white border-t-2 border-dashed border-sketch-black flex flex-col md:hidden overflow-y-auto"
           >
             <nav className="flex flex-col p-8 gap-8 font-mono text-xl uppercase tracking-widest text-sketch-black font-bold h-full">
+              {/* Mobile Search Bar */}
+              <form onSubmit={handleSearchSubmit} className="flex items-center border-2 border-sketch-black bg-white px-3 py-2 select-none relative w-full mb-2 shadow-[4px_4px_0px_#171717]">
+                <input
+                  type="text"
+                  placeholder="Search username..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full font-mono text-sm focus:outline-none bg-transparent text-sketch-black"
+                />
+                <button type="submit" className="text-sketch-black hover:text-blueprint-blue transition-colors cursor-pointer">
+                  <Search size={18} />
+                </button>
+              </form>
+
               {navLinks.map((link, index) => (
                 <motion.div key={link.name} variants={itemVariants}>
                   <Link 

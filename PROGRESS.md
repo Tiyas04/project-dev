@@ -16,7 +16,7 @@ DevArena is an AI-powered Competitive Programming Analytics Platform that helps 
 | Phase 4 — Topic Analysis                 | ✅ Complete     | 100%       |
 | Phase 5 — Arena Score                    | ⏳ Planned      | 0%         |
 | Phase 6 — Social Features                | ⏳ Planned      | 0%         |
-| Phase 7 — Public Profiles & Achievements | 🚧 In Progress  | 50%        |
+| Phase 7 — Public Profiles & Achievements | ✅ Complete     | 100%       |
 | Phase 8 — AI Features                    | ⏳ Planned      | 0%         |
 | Phase 9 — Background Jobs & Automation   | ⏳ Planned      | 0%         |
 
@@ -209,20 +209,23 @@ Implemented achievement visualizations:
 
 ---
 
-## Phase 7 — Public Profiles & Achievements 🚧
+## Phase 7 — Public Profiles & Achievements ✅
 
 ### Completed
 
 * [x] Achievement UI
 * [x] Badge Display Components
 * [x] Unlock Tracking Interface
-
-### Remaining
-
-* [ ] Public Profile Pages
-* [ ] Custom User Slugs
-* [ ] Shareable Profile Links
-* [ ] Public Statistics View
+* [x] Public Profile Pages
+* [x] Custom User Slugs / Handles
+* [x] Shareable Profile Links & Copy Buttons
+* [x] Public Statistics View (Recharts rating curves, diff charts, heatmaps, recent solves)
+* [x] Scannable Profile QR Code inside Coder Card
+* [x] Follow/Follower Social System (uniquely index relationships)
+* [x] Followers and Following lists API endpoints (`/profile/:username/followers` and `/profile/:username/following`)
+* [x] Reusable sketch-styled `FollowersModal` overlay component
+* [x] Integrated follower/following details modal on profile settings page and public profiles
+* [x] Fixed Coder Card export cropping and CORS image tainting for seamless PNG downloads
 
 ---
 
