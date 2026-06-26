@@ -26,10 +26,13 @@ export async function enrichUser(user) {
             codeforces: connectedAccount.codeforces?.username ? connectedAccount.codeforces.stats : null,
             github: connectedAccount.github?.username ? connectedAccount.github.stats : null,
         };
+        
+        userObj.devArenaScore = userObj.arenaScore || 0;
     } else {
         userObj.leetcode = "";
         userObj.codeforces = "";
         userObj.github = "";
+        userObj.devArenaScore = 0;
         userObj.stats = {
             leetcode: null,
             codeforces: null,

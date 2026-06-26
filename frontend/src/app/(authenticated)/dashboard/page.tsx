@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Trophy, TrendingUp, Code2, Medal, Target, Activity, Flame, RefreshCw } from "lucide-react";
+import { Trophy, TrendingUp, Code2, Medal, Target, Activity, Flame, RefreshCw, MessageSquare } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import { ActivityFeed } from "@/components/activity-feed";
 
 export default function Dashboard() {
   const { user, syncUserStats } = useAuth();
@@ -155,51 +156,12 @@ export default function Dashboard() {
 
   const achievements = getAchievements();
 
-  const activities = [];
-  if (user?.leetcode) {
-    activities.push({
-      platform: "LeetCode",
-      color: "bg-green-500",
-      content: <>Connected LeetCode profile: <span className="font-bold">@{user.leetcode}</span></>,
-      time: "Active"
-    });
-  }
-  if (user?.codeforces) {
-    activities.push({
-      platform: "Codeforces",
-      color: "bg-blue-500",
-      content: <>Connected Codeforces profile: <span className="font-bold">@{user.codeforces}</span></>,
-      time: "Active"
-    });
-  }
-  if (user?.github) {
-    activities.push({
-      platform: "GitHub",
-      color: "bg-purple-500",
-      content: <>Connected GitHub profile: <span className="font-bold">@{user.github}</span></>,
-      time: "Active"
-    });
-  }
-  if (hasConnections) {
-    activities.push({
-      platform: "System",
-      color: "bg-blueprint-blue",
-      content: <>All developer statistics synchronized successfully</>,
-      time: "Synced"
-    });
-  } else {
-    activities.push({
-      platform: "System",
-      color: "bg-red-500",
-      content: <>No active platforms connected. Link profiles in Settings.</>,
-      time: "Pending"
-    });
-  }
+    // We no longer populate the hardcoded activities array, using the ActivityFeed component instead.
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-12">
       {/* Welcome Banner */}
-      <section className="relative p-8 md:p-12 bg-white rough-border-blue overflow-hidden shadow-[8px_8px_0px_#1E3A8A]">
+      <section className="relative p-8 md:p-12 bg-white rough-border-blue overflow-hidden shadow-[8px_8px_0px_#1E3A8A] flex flex-col md:flex-row items-start justify-between gap-6">
         <div className="relative z-10">
           <h1 className="font-sketch text-4xl md:text-5xl text-sketch-black mb-4">
             Welcome back, <span className="text-blueprint-blue">{user?.name || "Coder"}!</span>
@@ -210,11 +172,25 @@ export default function Dashboard() {
               : "Welcome to DevArena! Connect your competitive programming or GitHub accounts to start tracking your progress and viewing your unified statistics."}
           </p>
         </div>
+        
+        {/* Score Badge */}
+        {hasConnections && (
+          <div className="relative z-10 flex flex-col items-center justify-center p-4 bg-blueprint-blue text-white border-2 border-sketch-black shadow-[4px_4px_0px_#171717] -rotate-2 shrink-0 min-w-[140px] hover:rotate-0 transition-transform cursor-default">
+            <Trophy size={24} className="mb-2" />
+            <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">DevArena Score</span>
+            <div className="flex items-end gap-1">
+              <span className="text-3xl font-sketch font-bold">{user?.devArenaScore || 0}</span>
+              <span className="text-xs font-mono opacity-80 pb-1">pts</span>
+            </div>
+          </div>
+        )}
+
         {/* Background decoration */}
         <div className="absolute -right-10 -bottom-20 text-[200px] text-blueprint-blue/5 font-sketch pointer-events-none transform rotate-12">
           DA
         </div>
       </section>
+
 
       {!hasConnections ? (
         <section className="bg-white p-8 rough-border shadow-[8px_8px_0px_#171717] flex flex-col items-center text-center space-y-6">
@@ -324,22 +300,12 @@ export default function Dashboard() {
 
           {/* Recent Activity / Setup Call to Action */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rough-border shadow-[4px_4px_0px_#171717] h-full">
-              <h3 className="font-mono text-xl font-bold text-sketch-black mb-6">Recent Activity</h3>
-              <div className="flex flex-col gap-4">
-                {activities.map((act, i) => (
-                  <div 
-                    key={i} 
-                    className={`flex items-center gap-4 pb-4 ${
-                      i < activities.length - 1 ? "border-b-2 border-dashed border-sketch-black/20" : ""
-                    }`}
-                  >
-                    <div className={`w-2 h-2 rounded-full ${act.color}`}></div>
-                    <p className="font-mono text-sm text-sketch-black">{act.content}</p>
-                    <span className="font-mono text-xs text-sketch-black/50 ml-auto">{act.time}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="bg-white p-8 rough-border shadow-[4px_4px_0px_#171717] h-full overflow-y-auto max-h-[400px]">
+              <h3 className="font-mono text-xl font-bold text-sketch-black mb-6 flex justify-between items-center">
+                Friend Activity
+                <Link href="/leaderboard" className="text-blueprint-blue text-sm hover:underline">View Leaderboard &rarr;</Link>
+              </h3>
+              <ActivityFeed />
             </div>
 
             <div className="bg-blueprint-blue p-8 rough-border shadow-[4px_4px_0px_#171717] text-white flex flex-col justify-between h-full">

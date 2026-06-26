@@ -218,8 +218,16 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     const followersCount = await Follow.countDocuments({ following: req.user._id });
     const followingCount = await Follow.countDocuments({ follower: req.user._id });
     
+    const following = await Follow.find({ follower: req.user._id }).select("following");
+    const followingIds = following.map(f => f.following.toString());
+    const friendsCount = await Follow.countDocuments({
+        following: req.user._id,
+        follower: { $in: followingIds }
+    });
+    
     enrichedUser.followersCount = followersCount;
     enrichedUser.followingCount = followingCount;
+    enrichedUser.friendsCount = friendsCount;
 
     return res
         .status(200)
@@ -553,6 +561,33 @@ const getFollowingList = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, following, "Following list fetched successfully"));
 });
 
+const getFriendsList = asyncHandler(async (req, res) => {
+    // Only the logged in user can see their own friends list
+    const { username } = req.params;
+    
+    if (username.toLowerCase() !== req.user.username.toLowerCase()) {
+        throw new ApiError(403, "You can only view your own friends list");
+    }
+
+    const user = req.user;
+    
+    // Find people the user follows
+    const following = await Follow.find({ follower: user._id }).select("following");
+    const followingIds = following.map(f => f.following.toString());
+    
+    // Find people who follow the user and are also in the followingIds
+    const friendsFollows = await Follow.find({
+        following: user._id,
+        follower: { $in: followingIds }
+    }).populate("follower", "name username avatar");
+    
+    const friends = friendsFollows.map(f => f.follower).filter(Boolean);
+    
+    return res
+        .status(200)
+        .json(new ApiResponse(200, friends, "Friends list fetched successfully"));
+});
+
 export {
     registerUser,
     loginUser,
@@ -567,5 +602,6 @@ export {
     unfollowUser,
     searchUsers,
     getFollowersList,
-    getFollowingList
+    getFollowingList,
+    getFriendsList
 }

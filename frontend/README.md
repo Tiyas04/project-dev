@@ -1,82 +1,95 @@
-# 💻 DevArena - Frontend Web App
+# DevArena Frontend
 
-[![React](https://img.shields.io/badge/React-19.x-blue.svg)](https://react.dev/)
-[![Next.js](https://img.shields.io/badge/Next.js-16.x-black.svg)](https://nextjs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.x-38B2AC.svg)](https://tailwindcss.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+> **Modern, responsive, and interactive dashboard built for competitive programmers.**
 
-Welcome to the frontend web application for **DevArena**. This is a modern, responsive, and interactive dashboard built using Next.js (App Router) and Tailwind CSS, featuring beautiful data visualizations and micro-animations.
+The DevArena frontend leverages Next.js and Tailwind CSS to deliver a beautifully designed, high-contrast dark theme utilizing glassmorphism and Framer Motion for a premium user experience.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-- **⚡ Modern Responsive Dashboard:** Dynamic layout tailored for competitive programmers to monitor ratings, streaks, and total solves.
-- **📊 Interactive Visualizations (Recharts):** 
-  - Radar charts mapping topic strengths.
-  - Growth line graphs showing rating history over time.
-  - Badges displaying difficulty ratios.
-  - Activity grids showing submissions heatmaps.
-- **🔐 Protected Navigation & Session Routing:** Authentication proxy and custom contexts that prevent unauthenticated users from visiting dashboard pages.
-- **🎨 Glassmorphic Dark UI:** Sleek, high-contrast dark theme utilizing Framer Motion for smooth tab switches, modal openings, and hover indicators.
-- **📁 Avatar & Profile Uploader:** Integrated avatar profile changes featuring custom file uploads and image conversions.
+- **Modern Responsive Dashboard**  
+  Dynamic layout tailored to monitor ratings, streaks, and total solves effortlessly.
+- **Interactive Visualizations**  
+  Rich data presentation using Recharts (Radar charts, growth line graphs, difficulty badges, and submission heatmaps).
+- **Protected Navigation**  
+  Secure routing with custom contexts preventing unauthenticated access to dashboard views.
+- **Glassmorphic Dark UI**  
+  A sleek aesthetic combined with smooth tab switches, modal transitions, and hover indicators via Framer Motion.
+- **Profile Customization**  
+  Integrated avatar updates with custom file uploads and image conversions.
 
 ---
 
-## 🚦 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18.0.0 or higher recommended)
-- [DevArena Backend REST API](file:///c:/Users/jhuma/OneDrive/Desktop/My%20Folder/My%20codes/Project%20Dev/backend) running locally on port 5000
+- Node.js (v18+)
+- DevArena Backend REST API running locally on port 5000.
 
-### Installation
+### Installation & Setup
 
-1. **Navigate to the frontend folder:**
-   ```bash
-   cd frontend
-   ```
-2. **Install project dependencies:**
+1. **Install dependencies**
    ```bash
    npm install
    ```
-3. **Environment Setup:**
+
+2. **Environment Configuration**
    Create a `.env` file in the root of the `frontend/` directory:
    ```env
    NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
    NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_oauth_client_id
    ```
 
-### Running Server
+### Running the Server
 
-- **Start Local Server:**
+- **Development Server:**
   ```bash
   npm run dev
   ```
-  Open [http://localhost:3000](http://localhost:3000) to view the client.
+  Access the client at `http://localhost:3000`.
 
-- **Production Build & Type Check:**
+- **Production Build:**
   ```bash
   npm run build
+  npm start
   ```
 
 ---
 
-## 📁 Page Routes & Folder Structure
+## Project Structure
 
 ```text
 frontend/
 ├── src/
 │   ├── app/
-│   │   ├── (authenticated)/    # Protected route pages group
-│   │   │   ├── dashboard/      # Unified metrics overview
-│   │   │   ├── stats/          # CP ratings, charts & stats
-│   │   │   ├── analysis/       # Topic strengths, skills & recent solves
-│   │   │   └── profile/        # User settings & profile avatar upload
-│   │   │   login/              # User credentials form
-│   │   │   register/           # User onboarding form
-│   │   └── page.tsx            # App landing page
-│   ├── components/             # Dynamic layouts & charts
-│   ├── context/                # AuthContext (JWT tokens, Google login)
-│   └── hooks/                  # HTTP client wrappers
+│   │   ├── (authenticated)/
+│   │   │   ├── analysis/
+│   │   │   ├── dashboard/
+│   │   │   ├── profile/
+│   │   │   └── stats/
+│   │   ├── auth/
+│   │   ├── search/
+│   │   └── user/
+│   ├── components/
+│   │   ├── about.tsx
+│   │   ├── background.tsx
+│   │   ├── faq.tsx
+│   │   ├── features.tsx
+│   │   ├── followers-modal.tsx
+│   │   ├── footer.tsx
+│   │   ├── hero.tsx
+│   │   ├── loggedin-footer.tsx
+│   │   ├── loggedin-navbar.tsx
+│   │   ├── login.tsx
+│   │   ├── navbar.tsx
+│   │   ├── protected-route.tsx
+│   │   ├── signup.tsx
+│   │   └── work.tsx
+│   ├── context/
+│   │   └── AuthContext.tsx
+│   ├── lib/
+│   │   └── axios.ts
+│   └── proxy.ts
 ```

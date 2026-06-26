@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { 
   Trophy, 
   TrendingUp, 
@@ -18,7 +19,8 @@ import {
   User as UserIcon,
   UserPlus,
   UserMinus,
-  Sparkles
+  Sparkles,
+  Lock
 } from "lucide-react";
 import {
   LineChart,
@@ -333,7 +335,7 @@ export default function PublicProfile() {
 
     const topicsMap: { [key: string]: { subject: string; easySolved: number; mediumSolved: number; hardSolved: number; total: number } } = {};
 
-    allQuestions.forEach((q: any) => {
+    recentSolved.forEach((q: any) => {
       const diff = (q.difficulty || "medium").toLowerCase();
       const tags = q.topicTags || [];
 
@@ -394,9 +396,9 @@ export default function PublicProfile() {
       });
     }
     if (!selectedTopic) {
-      return allQuestions;
+    return recentSolved;
     }
-    return allQuestions.filter((q: any) =>
+    return recentSolved.filter((q: any) =>
       q.topicTags?.some((tag: any) => {
         const name = tag.name
           .split(" ")
@@ -434,7 +436,7 @@ export default function PublicProfile() {
       : "Recently Updated Repositories"
     : selectedTopic
       ? `Solved Problems: ${selectedTopic} (${filteredQuestions.length})`
-      : `All Solved Problems (${allQuestions.length})`;
+      : `Recently Solved Problems (${recentSolved.length})`;
 
   const getAchievements = () => {
     const list: { title: string; desc: string; date: string }[] = [];
@@ -602,6 +604,11 @@ export default function PublicProfile() {
           </div>
 
           <div className="flex flex-row md:flex-col items-center justify-center gap-3 w-full md:w-auto relative z-10 shrink-0 font-mono">
+            {/* DevArena Score badge */}
+            <div className="bg-blueprint-blue text-white px-4 py-2 border-2 border-sketch-black shadow-[2px_2px_0px_#171717] flex flex-col items-center justify-center -rotate-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">DevArena Score</span>
+              <span className="text-xl font-sketch font-bold">{profile.devArenaScore || 0} pts</span>
+            </div>
             {/* Follow/Unfollow Button */}
             {!isOwnProfile && (
               <button
@@ -648,7 +655,25 @@ export default function PublicProfile() {
           </div>
         </section>
 
-        {connectedTabs.length === 0 ? (
+        {!currentUser ? (
+          <section className="bg-white p-12 rough-border shadow-[8px_8px_0px_#171717] flex flex-col items-center text-center space-y-6 mt-8">
+            <div className="w-16 h-16 bg-blueprint-blue/10 text-blueprint-blue flex items-center justify-center font-sketch text-4xl rough-border-blue transform -rotate-6">
+              <Lock size={36} />
+            </div>
+            <div className="space-y-4">
+              <h2 className="font-sketch text-3xl text-sketch-black">Login to View Full Stats</h2>
+              <p className="font-mono text-sketch-black/60 max-w-lg mx-auto text-sm leading-relaxed">
+                Log in to DevArena to view {profile.name}'s detailed coding stats, problem solving history, and GitHub contributions.
+              </p>
+              <Link 
+                href="/auth"
+                className="inline-block px-6 py-3 bg-blueprint-blue text-white font-bold font-mono text-sm border-2 border-sketch-black shadow-[4px_4px_0px_#171717] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all"
+              >
+                Log In Now
+              </Link>
+            </div>
+          </section>
+        ) : connectedTabs.length === 0 ? (
           <section className="bg-white p-8 rough-border shadow-[4px_4px_0px_#171717] text-center">
             <h3 className="font-sketch text-2xl text-sketch-black mb-2">No Profiles Connected</h3>
             <p className="font-mono text-sm text-sketch-black/60 max-w-md mx-auto">

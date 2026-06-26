@@ -14,10 +14,10 @@ DevArena is an AI-powered Competitive Programming Analytics Platform that helps 
 | Phase 2 — Platform Integrations          | ✅ Complete     | 100%       |
 | Phase 3 — Dashboard & Analytics          | ✅ Complete     | 100%       |
 | Phase 4 — Topic Analysis                 | ✅ Complete     | 100%       |
-| Phase 5 — Arena Score                    | ⏳ Planned      | 0%         |
-| Phase 6 — Social Features                | ⏳ Planned      | 0%         |
+| Phase 5 — Arena Score                    | ✅ Complete     | 100%       |
+| Phase 6 — Social Features                | ✅ Complete     | 100%       |
 | Phase 7 — Public Profiles & Achievements | ✅ Complete     | 100%       |
-| Phase 8 — AI Features                    | ⏳ Planned      | 0%         |
+| Phase 8 — AI Features                    | ✅ Complete     | 100%       |
 | Phase 9 — Background Jobs & Automation   | ⏳ Planned      | 0%         |
 
 ---
@@ -105,6 +105,18 @@ Implemented achievement visualizations:
 
 ---
 
+### AI Features
+
+* Interactive **AI Coach** suggestion chat interface
+* Dynamic personalized welcome roadmaps generated automatically on first visit based on LeetCode/CF/GitHub statistics
+* Beautiful custom Markdown rendering layout supporting custom cards for strengths/weaknesses/study steps and inline badges
+* Multi-model selection supporting Gemini 3.5 Flash, 2.5 Pro, 2.5 Flash, and 2.0 Flash
+* Load-spike fallback queue to gracefully handle transient Google Gemini service unavailable (503) errors
+* Dedicated modal reload buttons to regenerate AI topic insights on demand
+* MongoDB chat history persistence per user
+
+---
+
 # Phase Breakdown
 
 ## Phase 1 — Foundation ✅
@@ -186,26 +198,26 @@ Implemented achievement visualizations:
 
 ---
 
-## Phase 5 — Arena Score ⏳
+## Phase 5 — Arena Score ✅
 
-### Planned Features
+### Completed
 
-* Unified competitive programming rating (LeetCode + Codeforces)
-* Multi-platform score calculation
-* Arena Score dashboard integration
-* Arena Score leaderboard support
+* [x] Unified competitive programming rating (LeetCode + Codeforces)
+* [x] Multi-platform score calculation
+* [x] Arena Score dashboard integration
+* [x] Arena Score leaderboard support
 
 ---
 
-## Phase 6 — Social Features ⏳
+## Phase 6 — Social Features ✅
 
-### Planned Features
+### Completed
 
-* Friend Requests
-* User Search
-* Friend Activity Feed
-* Community Leaderboards
-* Growth Comparisons
+* [x] Friend Requests / Following System
+* [x] User Search
+* [x] Friend Activity Feed
+* [x] Community Leaderboards
+* [x] Growth Comparisons
 
 ---
 
@@ -220,26 +232,27 @@ Implemented achievement visualizations:
 * [x] Custom User Slugs / Handles
 * [x] Shareable Profile Links & Copy Buttons
 * [x] Public Statistics View (Recharts rating curves, diff charts, heatmaps, recent solves)
-* [x] Scannable Profile QR Code inside Coder Card
+* [x] Client-side generated Scannable Profile QR Code inside Coder Card using `next-qrcode`
 * [x] Follow/Follower Social System (uniquely index relationships)
 * [x] Followers and Following lists API endpoints (`/profile/:username/followers` and `/profile/:username/following`)
 * [x] Reusable sketch-styled `FollowersModal` overlay component
 * [x] Integrated follower/following details modal on profile settings page and public profiles
-* [x] Fixed Coder Card export cropping and CORS image tainting for seamless PNG downloads
+* [x] Fixed Coder Card export cropping, CORS image tainting, and dimension overflow for seamless PNG downloads
 
 ---
 
-## Phase 8 — AI Features ⏳
+## Phase 8 — AI Features ✅
 
-### Planned Features
+### Completed Features
 
-* AI Coach
-* Personalized Learning Roadmaps
-* Study Planner
-* Problem Recommendations
-* Contest Review Generator
-* Performance Insights Engine
-* Powered by Gemini API
+* [x] AI Coach chat interface for suggestions and custom developer roadmaps
+* [x] Personalized Learning Roadmaps generated automatically on first visit
+* [x] Weakness analysis study roadmaps based on topic scores
+* [x] Integrated with the new unified Google GenAI SDK (`@google/genai`) supporting Gemini Pro & Flash
+* [x] Automated load-spike resilience fallback loop (`3.5-flash` -> `2.5-pro` -> `2.5-flash` -> `2.0-flash`)
+* [x] Model selection dropdown menu on the Coach page
+* [x] Reload and Retry controls inside AI insights modal and error states
+* [x] MongoDB persistence for user chat logs with the AI Coach
 
 ---
 
@@ -258,41 +271,39 @@ Implemented achievement visualizations:
 
 # Immediate Development Priorities
 
-## Priority 1 — Unified Competitive Programming Arena Score
+## Priority 1 — Redis & BullMQ Infrastructure (Phase 9)
 
-Formulate a custom algorithm to calculate the unified CP performance score across connected platforms (LeetCode, Codeforces).
-
-Tasks:
-
-* Formulate scoring weight ratios (e.g. ratings vs solved count consistency)
-* Implement backend Arena Score calculator function
-* Store and update Arena Score in MongoDB user profile
-* Render unified score on frontend dashboards
-
----
-
-## Priority 2 — Public User Profiles
-
-Implement shareable public profiles for developers to showcase their stats.
-
-Targets:
-
-* Create backend routes for `/api/users/:username/profile`
-* Build dynamic, public-facing frontend routes `/user/[username]`
-* Render Radar Charts, badges, solved statistics, and recent activity for guest users
-* Implement metadata tags for social media preview cards
-
----
-
-## Priority 3 — Background Sync Automation (Queue Setup)
-
-Automate platform data updates behind the scenes to avoid user wait times during dashboard navigation.
+Establish a local and production Redis instance and set up the BullMQ queue manager to handle background processing asynchronously.
 
 Tasks:
 
-* Setup Redis connection and BullMQ processing pipeline
-* Create worker process for automated account synchronization
-* Add daily cron trigger for updates
+* [ ] Provision Redis instance (local + cloud production environment)
+* [ ] Initialize BullMQ connection manager in backend setup
+* [ ] Create reusable worker class templates for modular task handling
+
+---
+
+## Priority 2 — Automated Platform Data Synchronization (Phase 9)
+
+Set up scheduled background synchronization jobs to keep LeetCode, Codeforces, and GitHub stats updated without requiring manual sync trigger.
+
+Tasks:
+
+* [ ] Define background queue structures for stats retrieval
+* [ ] Schedule synchronization intervals (e.g. daily/weekly cron rules)
+* [ ] Handle API rate limits, backoff strategies, and retry queues gracefully
+
+---
+
+## Priority 3 — Background calculations & unlocks (Phase 9)
+
+Leverage asynchronous jobs to process heavier statistics calculations like Arena Score updates and automated achievement unlock checking.
+
+Tasks:
+
+* [ ] Queue Arena Score recalculations on successful platform sync events
+* [ ] Set up asynchronous achievement checker workers to process unlocked milestones
+* [ ] Generate and cache dynamic statistics charts periodically in the background
 
 ---
 
@@ -339,12 +350,11 @@ MongoDB
 
 # Next Major Milestone
 
-🎯 Goal: Implement Unified Arena Score & Shareable Public Profiles (Phase 5 & Phase 7)
+🎯 Goal: Implement Background Jobs & Automation (Phase 9)
 
 Expected Deliverables:
 
-* Combined developer metrics score calculation (Arena Score)
-* Public-facing user profile pages (`/user/[username]`)
-* SEO preview-ready profiles for developer portfolios
-
-This milestone will expand DevArena from a private personal dashboard into a public-facing developer showcase and portfolio utility.
+* Redis integration and BullMQ queue setup
+* Automated background synchronization jobs for LeetCode, Codeforces, and GitHub stats
+* Periodic Arena Score recalculations
+* Achievement processing triggers on background events

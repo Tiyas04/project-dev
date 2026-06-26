@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import api from "@/lib/axios";
+import { AiInsightsPanel } from "@/components/ai-insights-panel";
 
 // Animation Variants
 const containerVariants: Variants = {
@@ -278,6 +280,11 @@ export default function AnalysisPage() {
   const [topicSearch, setTopicSearch] = useState("");
   const [strengthFilter, setStrengthFilter] = useState("ALL");
 
+  const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiContent, setAiContent] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+
   const recentSolved = platformStats?.recentSolvedQuestions || [];
   const allQuestions = platformStats?.accumulatedSolvedQuestions || [];
 
@@ -288,6 +295,29 @@ export default function AnalysisPage() {
     setTopicSearch("");
     setStrengthFilter("ALL");
   }, [platform]);
+
+  const generateAiInsights = async () => {
+    setAiPanelOpen(true);
+    setAiLoading(true);
+    setAiError(null);
+    setAiContent(null);
+
+    try {
+      const topTopics = dynamicTopicData.slice(0, 5);
+      const weakTopics = dynamicTopicData.slice().reverse().slice(0, 5);
+
+      const res = await api.post("/ai/analyze-topics", {
+        platform,
+        topTopics,
+        weakTopics
+      });
+      setAiContent(res.data.data.analysis);
+    } catch (err: any) {
+      setAiError(err.response?.data?.message || err.message || "Failed to generate AI insights.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   useEffect(() => {
     setAnalysisPage(1);
@@ -314,7 +344,7 @@ export default function AnalysisPage() {
 
     const topicsMap: { [key: string]: { subject: string; easySolved: number; mediumSolved: number; hardSolved: number; total: number } } = {};
 
-    allQuestions.forEach((q: any) => {
+    recentSolved.forEach((q: any) => {
       const diff = (q.difficulty || "medium").toLowerCase();
       const tags = q.topicTags || [];
 
@@ -375,9 +405,9 @@ export default function AnalysisPage() {
       });
     }
     if (!selectedTopic) {
-      return allQuestions;
+    return recentSolved;
     }
-    return allQuestions.filter((q: any) =>
+    return recentSolved.filter((q: any) =>
       q.topicTags?.some((tag: any) => {
         const name = tag.name
           .split(" ")
@@ -393,17 +423,12 @@ export default function AnalysisPage() {
   const analysisStartIndex = (analysisPage - 1) * analysisItemsPerPage;
   const paginatedFilteredQuestions = filteredQuestions.slice(analysisStartIndex, analysisStartIndex + analysisItemsPerPage);
 
-  // Filter dynamicTopicData based on topicSearch and strengthFilter
+  // Filter dynamicTopicData based on topicSearch
   const filteredTopicData = React.useMemo(() => {
     return dynamicTopicData.filter((item: any) => {
-      const matchesSearch = item.subject.toLowerCase().includes(topicSearch.toLowerCase());
-      if (!matchesSearch) return false;
-
-      if (strengthFilter === "ALL") return true;
-      const category = getStrengthCategory(item.A);
-      return category.label.toUpperCase() === strengthFilter.toUpperCase();
+      return item.subject.toLowerCase().includes(topicSearch.toLowerCase());
     });
-  }, [dynamicTopicData, topicSearch, strengthFilter]);
+  }, [dynamicTopicData, topicSearch]);
 
   const topicsPerPage = 5;
   const totalTopicPages = Math.ceil(filteredTopicData.length / topicsPerPage);
@@ -416,7 +441,7 @@ export default function AnalysisPage() {
       : "Recently Updated Repositories"
     : selectedTopic
       ? `Solved Problems: ${selectedTopic} (${filteredQuestions.length})`
-      : `All Solved Problems (${allQuestions.length})`;
+      : `Recently Solved Problems (${recentSolved.length})`;
 
   // Format date helper
   const formatDate = (val: string | number) => {
@@ -437,18 +462,39 @@ export default function AnalysisPage() {
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-8 pb-12 overflow-hidden">
+      <AiInsightsPanel 
+        isOpen={aiPanelOpen}
+        onClose={() => setAiPanelOpen(false)}
+        loading={aiLoading}
+        content={aiContent}
+        error={aiError}
+        onReload={generateAiInsights}
+      />
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4"
+        className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-blueprint-blue text-white flex items-center justify-center font-sketch text-3xl rough-border-blue transform -rotate-6 shadow-[4px_4px_0px_#171717]">
-            <Brain size={28} />
-          </div>
-          <h1 className="font-sketch text-4xl md:text-5xl text-sketch-black">Code Analysis</h1>
+        <div>
+          <h1 className="font-sketch text-4xl text-sketch-black flex items-center gap-3">
+            <Brain size={32} className="text-blueprint-blue" />
+            Topics Covered Recently
+          </h1>
+          <p className="font-mono text-sketch-black/60 mt-1">
+            Overview of algorithmic topics from your recently solved problems.
+          </p>
         </div>
+        {hasConnections && dynamicTopicData.length > 0 && (
+          <button 
+            onClick={generateAiInsights}
+            className="flex items-center gap-2 px-4 py-2 bg-blueprint-blue text-white font-mono font-bold text-sm border-2 border-sketch-black shadow-[4px_4px_0px_#171717] hover:-translate-y-1 hover:shadow-[6px_6px_0px_#171717] transition-all cursor-pointer"
+          >
+            <Sparkles size={16} />
+            Generate AI Insights
+          </button>
+        )}
       </motion.div>
 
       {!hasConnections ? (
@@ -499,52 +545,6 @@ export default function AnalysisPage() {
                 exit={{ opacity: 0, y: -20, transition: { duration: 0.2 } }}
                 className="space-y-8"
               >
-                {/* Gemini AI Coder Review Placeholder Card */}
-                <motion.section 
-                  variants={itemVariants} 
-                  className="relative overflow-hidden bg-linear-to-br from-blue-950 via-slate-900 to-indigo-950 text-white p-6 md:p-8 border-4 border-double border-blue-400/80 shadow-[6px_6px_0px_#171717]"
-                >
-                  {/* Decorative Glowing Elements */}
-                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                  <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 bg-blue-500/20 text-blue-300 flex items-center justify-center rounded-xl border border-blue-400/40 relative">
-                        <Sparkles size={32} className="animate-pulse" />
-                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-3">
-                          <h3 className="font-sketch text-2xl text-blue-200 uppercase tracking-wide">Gemini AI Coder Review</h3>
-                          <span className="px-2 py-[2px] bg-blue-500/30 text-blue-300 text-[10px] uppercase font-bold font-mono border border-blue-500/40 rounded">
-                            AI Engine
-                          </span>
-                        </div>
-                        <p className="font-mono text-xs text-slate-300 max-w-2xl leading-relaxed">
-                          {platform === "GitHub" 
-                            ? "Gemini will scan your public repositories to review architecture, code quality, dependency health, and test coverage, generating detailed code-style suggestions."
-                            : "Gemini will analyze your dynamic topic strengths, submission times, and problem error patterns to map out personalized problem recommendations and efficiency insights."}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-start md:items-end gap-1 font-mono">
-                      <div className="flex items-center gap-2">
-                        <motion.div 
-                          animate={pulseAnimation}
-                          className="w-3.5 h-3.5 bg-blue-400 rounded-full shrink-0 shadow-[0_0_10px_#60a5fa]" 
-                        />
-                        <span className="text-sm font-bold text-blue-400 uppercase tracking-widest">Coming Soon</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">Next Major Platform Update</span>
-                    </div>
-                  </div>
-                </motion.section>
-
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                   {/* Topic / Skill Strengths Analysis */}
                   <motion.section 
@@ -553,7 +553,7 @@ export default function AnalysisPage() {
                   >
                     <h3 className="font-mono text-xl font-bold text-sketch-black mb-6 pb-4 border-b-2 border-dashed border-sketch-black/10 flex items-center gap-2">
                       <TrendingUp size={20} className="text-blueprint-blue" />
-                      {platform === "GitHub" ? "Language Strengths" : `Topic Analysis (${platform})`}
+                      {platform === "GitHub" ? "Recent Languages Used" : "Recent Topics Studied"}
                     </h3>
 
                     <div className="flex flex-col sm:flex-row gap-2 mb-6 font-mono">
@@ -565,23 +565,8 @@ export default function AnalysisPage() {
                           setTopicSearch(e.target.value);
                           setTopicPage(1);
                         }}
-                        className="flex-1 px-3 py-1 text-xs border-2 border-sketch-black bg-white focus:outline-none"
+                        className="flex-1 px-3 py-1.5 text-xs border-2 border-sketch-black bg-white focus:outline-none"
                       />
-                      <select
-                        value={strengthFilter}
-                        onChange={(e) => {
-                          setStrengthFilter(e.target.value);
-                          setTopicPage(1);
-                        }}
-                        className="px-3 py-1 text-xs border-2 border-sketch-black bg-white focus:outline-none cursor-pointer"
-                      >
-                        <option value="ALL">All Strengths</option>
-                        <option value="UNEXPLORED">Unexplored (0-20)</option>
-                        <option value="NEEDS PRACTICE">Needs Practice (21-40)</option>
-                        <option value="IMPROVING">Improving (41-60)</option>
-                        <option value="STRONG">Strong (61-80)</option>
-                        <option value="MASTERED">Mastered (81-100)</option>
-                      </select>
                     </div>
 
                     <div className="flex-1 space-y-4">
@@ -594,7 +579,6 @@ export default function AnalysisPage() {
                           <div className="space-y-4">
                             {paginatedTopics.map((item: any) => {
                               const isSelected = selectedTopic === item.subject;
-                              const category = getStrengthCategory(item.A);
                               
                               return (
                                 <div 
@@ -625,8 +609,6 @@ export default function AnalysisPage() {
                                       </span>
                                       {platform !== "GitHub" ? (
                                         <div className="text-[10px] text-sketch-black/50 font-semibold flex items-center gap-1.5">
-                                          <span>Platform total: {item.totalOnPlatform}</span>
-                                          <span>•</span>
                                           <span>Solved: {item.total}</span>
                                         </div>
                                       ) : (
@@ -635,49 +617,22 @@ export default function AnalysisPage() {
                                         </div>
                                       )}
                                     </div>
-                                    <div className="text-right shrink-0">
-                                      <span className={`font-sketch text-lg md:text-xl font-bold leading-none ${category.textClr}`}>
-                                        {item.A}%
-                                      </span>
-                                      <div className="text-[9px] text-sketch-black/40 uppercase tracking-widest font-bold">
-                                        STRENGTH
-                                      </div>
-                                    </div>
-                                  </div>
-                                  
-                                  {/* Blueprint progress bar ruler */}
-                                  <div className="relative w-full h-4 bg-slate-50 border border-sketch-black/10 rounded-sm overflow-hidden flex items-center">
-                                    {/* Rule ticks (representing 10% divisions) */}
-                                    <div className="absolute inset-0 flex justify-between pointer-events-none opacity-[0.08]">
-                                      {[...Array(11)].map((_, idx) => (
-                                        <div key={idx} className="w-[1.5px] h-full bg-sketch-black" />
-                                      ))}
-                                    </div>
-                                    
-                                    {/* Dynamic filled bar with category specific gradient */}
-                                    <div 
-                                      className={`h-full bg-linear-to-r ${category.barGrad} border-r-2 border-sketch-black shadow-[inset_-1px_0px_3px_rgba(0,0,0,0.2)] transition-all duration-500 ease-out`} 
-                                      style={{ 
-                                        width: `${item.A}%`,
-                                        backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.05), rgba(255,255,255,0.05) 4px, rgba(255,255,255,0) 4px, rgba(255,255,255,0) 8px)'
-                                      }} 
-                                    />
                                   </div>
 
-                                  <div className="flex items-center justify-between gap-2 pt-1">
+                                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-dashed border-sketch-black/5">
                                     {/* Difficulty breakdown badges */}
                                     {platform !== "GitHub" ? (
                                       <div className="flex flex-wrap gap-2 text-[9px] font-bold">
                                         <span className="flex items-center gap-1 px-1.5 py-0.5 bg-green-50 border border-green-200 text-green-700 rounded-sm">
-                                          <span className="w-1 h-1 rounded-full bg-green-500"></span>
+                                          <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                                           Easy: {item.easySolved ?? 0}
                                         </span>
                                         <span className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-sm">
-                                          <span className="w-1 h-1 rounded-full bg-amber-500"></span>
-                                          Med: {item.mediumSolved ?? 0}
+                                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                          Medium: {item.mediumSolved ?? 0}
                                         </span>
                                         <span className="flex items-center gap-1 px-1.5 py-0.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-sm">
-                                          <span className="w-1 h-1 rounded-full bg-rose-500"></span>
+                                          <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                           Hard: {item.hardSolved ?? 0}
                                         </span>
                                       </div>
@@ -687,12 +642,6 @@ export default function AnalysisPage() {
                                         <span className="text-[10px] font-mono text-sketch-black/60 font-semibold">{item.subject} Color</span>
                                       </div>
                                     )}
-
-                                    {/* Dynamic Strength Category Badge */}
-                                    <span className={`text-[9px] px-1.5 py-0.5 border border-dashed font-bold uppercase rounded-sm flex items-center gap-1 tracking-wider ${category.textClass}`}>
-                                      <span className={`w-1 h-1 rounded-full ${category.dotClass}`}></span>
-                                      {category.label}
-                                    </span>
                                   </div>
                                 </div>
                               );

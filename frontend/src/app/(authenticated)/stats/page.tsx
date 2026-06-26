@@ -296,7 +296,7 @@ export default function Stats() {
                 <section className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717] lg:col-span-5 flex flex-col">
                   <h3 className="font-mono text-xl font-bold text-sketch-black mb-6 flex items-center gap-2">
                     <Target size={20} className="text-blueprint-blue" />
-                    {platform === "GitHub" ? "Languages Breakdown" : `Problems Solved (${platform})`}
+                    {platform === "GitHub" ? "Languages Breakdown" : `Recently Solved Problems (${platform})`}
                   </h3>
                   <div className="flex-1 flex flex-col lg:flex-row items-center justify-center gap-8">
                     <div className="h-[200px] w-[200px]">
@@ -452,7 +452,7 @@ export default function Stats() {
                   <h3 className="font-mono text-xl font-bold text-sketch-black mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-dashed border-sketch-black/10 pb-4">
                     <div className="flex items-center gap-2">
                       <Code2 size={20} className="text-blueprint-blue" />
-                      <span>Solved Problems ({platform})</span>
+                      <span>Recent Problems ({platform})</span>
                     </div>
 
                     <div className="flex items-center gap-2">

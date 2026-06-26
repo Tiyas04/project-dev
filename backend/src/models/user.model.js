@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema(
         },
         refreshToken: {
             type: String
+        },
+        arenaScore: {
+            type: Number,
+            default: 0
         }
     },
     {

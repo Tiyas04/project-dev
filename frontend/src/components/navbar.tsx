@@ -5,7 +5,6 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
-import { Search } from "lucide-react";
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -81,20 +80,6 @@ export function Navbar() {
           <Link href="/" className="w-10 h-10 bg-blueprint-blue text-white flex items-center justify-center font-sketch text-2xl rough-border-blue transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
             DA
           </Link>
-          
-          {/* Guest Search Bar next to logo */}
-          <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center border-2 border-sketch-black bg-white px-2 py-1 select-none relative max-w-[180px] md:max-w-[220px] w-full ml-4 shadow-[2px_2px_0px_#171717]">
-            <input
-              type="text"
-              placeholder="Search username..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full font-mono text-xs focus:outline-none bg-transparent text-sketch-black"
-            />
-            <button type="submit" className="text-sketch-black hover:text-blueprint-blue transition-colors cursor-pointer">
-              <Search size={14} />
-            </button>
-          </form>
         </div>
         
         {/* Middle: Links */}
@@ -162,20 +147,6 @@ export function Navbar() {
             className="fixed inset-0 top-[74px] z-40 bg-white border-t-2 border-dashed border-sketch-black flex flex-col md:hidden overflow-y-auto"
           >
             <nav className="flex flex-col p-8 gap-8 font-mono text-xl uppercase tracking-widest text-sketch-black font-bold h-full">
-              {/* Mobile Search Bar */}
-              <form onSubmit={handleSearchSubmit} className="flex items-center border-2 border-sketch-black bg-white px-3 py-2 select-none relative w-full mb-2 shadow-[4px_4px_0px_#171717]">
-                <input
-                  type="text"
-                  placeholder="Search username..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full font-mono text-sm focus:outline-none bg-transparent text-sketch-black"
-                />
-                <button type="submit" className="text-sketch-black hover:text-blueprint-blue transition-colors cursor-pointer">
-                  <Search size={18} />
-                </button>
-              </form>
-
               <motion.div variants={itemVariants}>
                 <Link href="/" onClick={closeMobileMenu} className="hover:text-blueprint-blue w-fit border-b-2 border-transparent hover:border-blueprint-blue pb-1 flex items-center gap-4">
                   <span className="text-blueprint-blue/40 text-sm">01</span> Home

@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
-import { User, LogOut, LayoutDashboard, BarChart2, Menu, X, TrendingUp, Zap, Search } from "lucide-react";
+import { User, LogOut, LayoutDashboard, BarChart2, Menu, X, TrendingUp, Zap, Search, Brain } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export function LoggedInNavbar() {
@@ -58,6 +58,7 @@ export function LoggedInNavbar() {
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
     { name: "Stats", path: "/stats", icon: <BarChart2 size={18} /> },
     { name: "Analysis", path: "/analysis", icon: <Zap size={18} /> },
+    { name: "AI Coach", path: "/ai-coach", icon: <Brain size={18} /> },
   ];
 
   return (

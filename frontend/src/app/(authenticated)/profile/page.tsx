@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { User, Mail, Link as LinkIcon, Code2, Camera, Download, QrCode, Trash2 } from "lucide-react";
+import { User, Mail, Link as LinkIcon, Code2, Camera, Download, QrCode, Trash2, Trophy } from "lucide-react";
 import { toPng } from "html-to-image";
 import { useAuth } from "@/context/AuthContext";
 import { FollowersModal } from "@/components/followers-modal";
+import { useQRCode } from "next-qrcode";
 
 export default function Profile() {
   const { user, updateAvatar, updateProfile, connectPlatform, disconnectPlatform } = useAuth();
+  const { Canvas } = useQRCode();
 
   const [name, setName] = useState(user?.name || "");
   const [username, setUsername] = useState(user?.username || "");
@@ -30,10 +32,10 @@ export default function Profile() {
 
   // Follower/Following modal states
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"followers" | "following">("followers");
+  const [modalType, setModalType] = useState<"followers" | "following" | "friends">("followers");
 
   // Data URLs for card capture to bypass CORS taint
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  const [profileUrl, setProfileUrl] = useState<string>("");
   const [avatarDataUrl, setAvatarDataUrl] = useState<string>("");
 
   const hasConnections = !!(user?.leetcode || user?.codeforces || user?.github);
@@ -55,23 +57,10 @@ export default function Profile() {
     }
   }, [user]);
 
-  // Fetch QR Code as Base64 to prevent canvas taint during download
+  // Generate profile URL for the QR code
   useEffect(() => {
     if (typeof window !== "undefined" && user?.username) {
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}/user/${user.username}`)}`;
-      fetch(qrUrl)
-        .then(response => response.blob())
-        .then(blob => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setQrCodeDataUrl(reader.result as string);
-          };
-          reader.readAsDataURL(blob);
-        })
-        .catch(err => {
-          console.error("Failed to load QR code as Data URL:", err);
-          setQrCodeDataUrl(qrUrl);
-        });
+      setProfileUrl(`${window.location.origin}/user/${user.username}`);
     }
   }, [user?.username]);
 
@@ -243,7 +232,7 @@ export default function Profile() {
             <p className="font-mono text-sm text-sketch-black/60 mb-2">@{username || "user"}</p>
             
             {/* Clickable followers and following stats */}
-            <div className="flex gap-3 font-mono text-xs font-bold mb-4">
+            <div className="flex flex-wrap gap-2 font-mono text-xs font-bold mb-4">
               <button
                 type="button"
                 onClick={() => {
@@ -264,6 +253,16 @@ export default function Profile() {
               >
                 Following: <span className="text-blueprint-blue">{user?.followingCount ?? 0}</span>
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalType("friends");
+                  setModalOpen(true);
+                }}
+                className="flex items-center gap-1 bg-paper border border-sketch-black/10 px-2 py-1 rounded shadow-sm hover:border-green-600 hover:text-green-600 transition-colors cursor-pointer"
+              >
+                Friends: <span className="text-green-600">{user?.friendsCount ?? 0}</span>
+              </button>
             </div>
             
             {/* Share Profile button */}
@@ -279,6 +278,18 @@ export default function Profile() {
               <LinkIcon size={14} />
               {shareCopied ? "Copied!" : "Share Profile"}
             </button>
+          </div>
+
+          <div className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717] mb-8">
+            <h3 className="font-mono text-lg font-bold text-sketch-black mb-2 flex items-center gap-2">
+              <Trophy size={18} className="text-blueprint-blue" />
+              DevArena Score
+            </h3>
+            <div className="flex items-end gap-2">
+              <span className="text-4xl font-sketch font-bold text-sketch-black">{user?.devArenaScore || 0}</span>
+              <span className="text-sm font-mono text-sketch-black/60 pb-1">pts</span>
+            </div>
+            <p className="font-mono text-[10px] text-sketch-black/50 mt-2">Calculated from LeetCode, Codeforces, & GitHub.</p>
           </div>
 
           <div className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717]">
@@ -540,13 +551,13 @@ export default function Profile() {
               </button>
             </div>
 
-            <div className="flex justify-center items-center overflow-hidden h-[200px] min-[380px]:h-[230px] sm:h-[270px] w-full">
+            <div className="flex justify-center items-center overflow-hidden h-[220px] min-[380px]:h-[250px] sm:h-[300px] w-full">
               {/* Scale wrapper so html-to-image captures unscaled bounds */}
               <div className="scale-[0.7] min-[380px]:scale-[0.85] sm:scale-100 origin-center shrink-0">
                 {/* The actual ID card element to capture */}
                 <div
                   ref={cardRef}
-                  className="w-[400px] h-[250px] bg-paper rough-border p-6 flex flex-col justify-between relative overflow-hidden text-left"
+                  className="w-[400px] h-[280px] bg-paper rough-border p-6 flex flex-col justify-between relative overflow-hidden text-left"
                   style={{
                     backgroundImage: "radial-gradient(#ccc 1px, transparent 1px)",
                     backgroundSize: "20px 20px"
@@ -590,7 +601,7 @@ export default function Profile() {
                     </p>
                   </div>
                 ) : (
-                  <div className={`grid gap-4 my-4 font-mono ${connectedPlatformsCount === 1
+                  <div className={`grid gap-4 my-3 font-mono ${connectedPlatformsCount === 1
                       ? "grid-cols-1"
                       : connectedPlatformsCount === 2
                         ? "grid-cols-2"
@@ -619,12 +630,15 @@ export default function Profile() {
 
                 <div className="flex justify-between items-end border-t-2 border-sketch-black pt-2">
                   <p className="font-mono text-[10px] font-bold text-sketch-black/80">ISSUED: {issueDate || "..."}</p>
-                  <div className="w-10 h-10 border-2 border-sketch-black bg-white flex items-center justify-center p-0.5 overflow-hidden shrink-0">
-                    {qrCodeDataUrl ? (
-                      <img
-                        src={qrCodeDataUrl}
-                        alt="Profile QR"
-                        className="w-full h-full object-contain"
+                  <div className="w-16 h-16 border-2 border-sketch-black bg-white flex items-center justify-center p-0.5 overflow-hidden shrink-0">
+                    {profileUrl ? (
+                      <Canvas
+                        text={profileUrl}
+                        options={{
+                          errorCorrectionLevel: 'L',
+                          margin: 1,
+                          width: 60,
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200 animate-pulse" />
