@@ -50,6 +50,28 @@ function SearchResultsContent() {
   const showLoggedInNavbar = !!currentUser;
 
   const renderContent = () => {
+    if (!currentUser) {
+      return (
+        <div className="bg-white p-12 rough-border shadow-[8px_8px_0px_#171717] flex flex-col items-center text-center space-y-6 my-12">
+          <div className="w-16 h-16 bg-blueprint-blue/10 text-blueprint-blue flex items-center justify-center font-sketch text-4xl rough-border-blue transform rotate-6">
+            <Search size={36} />
+          </div>
+          <div className="space-y-4">
+            <h2 className="font-sketch text-3xl text-sketch-black">Login to View Search</h2>
+            <p className="font-mono text-sketch-black/60 max-w-lg mx-auto text-sm leading-relaxed">
+              You must be logged in to search for other programmers on DevArena.
+            </p>
+            <Link 
+              href="/auth"
+              className="inline-block px-6 py-3 bg-blueprint-blue text-white font-bold font-mono text-sm border-2 border-sketch-black shadow-[4px_4px_0px_#171717] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all"
+            >
+              Log In Now
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
     if (loading) {
       return (
         <div className="w-full space-y-6 max-w-4xl mx-auto py-12 animate-pulse font-mono">

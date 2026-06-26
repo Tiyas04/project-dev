@@ -16,7 +16,7 @@ interface FollowersModalProps {
   isOpen: boolean;
   onClose: () => void;
   username: string;
-  type: "followers" | "following";
+  type: "followers" | "following" | "friends";
 }
 
 export function FollowersModal({ isOpen, onClose, username, type }: FollowersModalProps) {
@@ -57,7 +57,7 @@ export function FollowersModal({ isOpen, onClose, username, type }: FollowersMod
         {/* Header */}
         <div className="flex items-center justify-between border-b-2 border-dashed border-sketch-black/20 pb-3 mb-4 shrink-0">
           <h3 className="font-sketch text-2xl text-sketch-black capitalize">
-            {type === "followers" ? "Followers" : "Following"} ({users.length})
+            {type === "followers" ? "Followers" : type === "following" ? "Following" : "Friends"} ({users.length})
           </h3>
           <button
             onClick={onClose}
@@ -80,7 +80,7 @@ export function FollowersModal({ isOpen, onClose, username, type }: FollowersMod
             <div className="text-center py-8 text-red-500 font-bold">{error}</div>
           ) : users.length === 0 ? (
             <div className="text-center py-12 text-sketch-black/40 font-bold uppercase tracking-wider">
-              {type === "followers" ? "No followers yet" : "Not following anyone yet"}
+              {type === "followers" ? "No followers yet" : type === "following" ? "Not following anyone yet" : "No friends yet"}
             </div>
           ) : (
             <div className="space-y-3">

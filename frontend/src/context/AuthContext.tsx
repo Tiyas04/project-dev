@@ -13,6 +13,8 @@ export interface User {
   coverImage?: string;
   followersCount?: number;
   followingCount?: number;
+  friendsCount?: number;
+  devArenaScore?: number;
   leetcode?: string;
   codeforces?: string;
   github?: string;

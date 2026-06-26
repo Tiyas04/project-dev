@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { User, Mail, Link as LinkIcon, Code2, Camera, Download, QrCode, Trash2 } from "lucide-react";
+import { User, Mail, Link as LinkIcon, Code2, Camera, Download, QrCode, Trash2, Trophy } from "lucide-react";
 import { toPng } from "html-to-image";
 import { useAuth } from "@/context/AuthContext";
 import { FollowersModal } from "@/components/followers-modal";
@@ -32,7 +32,7 @@ export default function Profile() {
 
   // Follower/Following modal states
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"followers" | "following">("followers");
+  const [modalType, setModalType] = useState<"followers" | "following" | "friends">("followers");
 
   // Data URLs for card capture to bypass CORS taint
   const [profileUrl, setProfileUrl] = useState<string>("");
@@ -232,7 +232,7 @@ export default function Profile() {
             <p className="font-mono text-sm text-sketch-black/60 mb-2">@{username || "user"}</p>
             
             {/* Clickable followers and following stats */}
-            <div className="flex gap-3 font-mono text-xs font-bold mb-4">
+            <div className="flex flex-wrap gap-2 font-mono text-xs font-bold mb-4">
               <button
                 type="button"
                 onClick={() => {
@@ -253,6 +253,16 @@ export default function Profile() {
               >
                 Following: <span className="text-blueprint-blue">{user?.followingCount ?? 0}</span>
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalType("friends");
+                  setModalOpen(true);
+                }}
+                className="flex items-center gap-1 bg-paper border border-sketch-black/10 px-2 py-1 rounded shadow-sm hover:border-green-600 hover:text-green-600 transition-colors cursor-pointer"
+              >
+                Friends: <span className="text-green-600">{user?.friendsCount ?? 0}</span>
+              </button>
             </div>
             
             {/* Share Profile button */}
@@ -268,6 +278,18 @@ export default function Profile() {
               <LinkIcon size={14} />
               {shareCopied ? "Copied!" : "Share Profile"}
             </button>
+          </div>
+
+          <div className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717] mb-8">
+            <h3 className="font-mono text-lg font-bold text-sketch-black mb-2 flex items-center gap-2">
+              <Trophy size={18} className="text-blueprint-blue" />
+              DevArena Score
+            </h3>
+            <div className="flex items-end gap-2">
+              <span className="text-4xl font-sketch font-bold text-sketch-black">{user?.devArenaScore || 0}</span>
+              <span className="text-sm font-mono text-sketch-black/60 pb-1">pts</span>
+            </div>
+            <p className="font-mono text-[10px] text-sketch-black/50 mt-2">Calculated from LeetCode, Codeforces, & GitHub.</p>
           </div>
 
           <div className="bg-white p-6 rough-border shadow-[4px_4px_0px_#171717]">
@@ -608,14 +630,14 @@ export default function Profile() {
 
                 <div className="flex justify-between items-end border-t-2 border-sketch-black pt-2">
                   <p className="font-mono text-[10px] font-bold text-sketch-black/80">ISSUED: {issueDate || "..."}</p>
-                  <div className="w-10 h-10 border-2 border-sketch-black bg-white flex items-center justify-center p-0.5 overflow-hidden shrink-0">
+                  <div className="w-16 h-16 border-2 border-sketch-black bg-white flex items-center justify-center p-0.5 overflow-hidden shrink-0">
                     {profileUrl ? (
                       <Canvas
                         text={profileUrl}
                         options={{
-                          errorCorrectionLevel: 'M',
-                          margin: 0,
-                          width: 36,
+                          errorCorrectionLevel: 'L',
+                          margin: 1,
+                          width: 60,
                         }}
                       />
                     ) : (

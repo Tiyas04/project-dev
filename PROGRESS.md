@@ -14,8 +14,8 @@ DevArena is an AI-powered Competitive Programming Analytics Platform that helps 
 | Phase 2 — Platform Integrations          | ✅ Complete     | 100%       |
 | Phase 3 — Dashboard & Analytics          | ✅ Complete     | 100%       |
 | Phase 4 — Topic Analysis                 | ✅ Complete     | 100%       |
-| Phase 5 — Arena Score                    | ⏳ Planned      | 0%         |
-| Phase 6 — Social Features                | ⏳ Planned      | 0%         |
+| Phase 5 — Arena Score                    | ✅ Complete     | 100%       |
+| Phase 6 — Social Features                | ✅ Complete     | 100%       |
 | Phase 7 — Public Profiles & Achievements | ✅ Complete     | 100%       |
 | Phase 8 — AI Features                    | ⏳ Planned      | 0%         |
 | Phase 9 — Background Jobs & Automation   | ⏳ Planned      | 0%         |
@@ -186,26 +186,26 @@ Implemented achievement visualizations:
 
 ---
 
-## Phase 5 — Arena Score ⏳
+## Phase 5 — Arena Score ✅
 
-### Planned Features
+### Completed
 
-* Unified competitive programming rating (LeetCode + Codeforces)
-* Multi-platform score calculation
-* Arena Score dashboard integration
-* Arena Score leaderboard support
+* [x] Unified competitive programming rating (LeetCode + Codeforces)
+* [x] Multi-platform score calculation
+* [x] Arena Score dashboard integration
+* [x] Arena Score leaderboard support
 
 ---
 
-## Phase 6 — Social Features ⏳
+## Phase 6 — Social Features ✅
 
-### Planned Features
+### Completed
 
-* Friend Requests
-* User Search
-* Friend Activity Feed
-* Community Leaderboards
-* Growth Comparisons
+* [x] Friend Requests / Following System
+* [x] User Search
+* [x] Friend Activity Feed
+* [x] Community Leaderboards
+* [x] Growth Comparisons
 
 ---
 

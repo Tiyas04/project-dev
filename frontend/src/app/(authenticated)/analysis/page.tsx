@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import api from "@/lib/axios";
+import { AiInsightsPanel } from "@/components/ai-insights-panel";
 
 // Animation Variants
 const containerVariants: Variants = {
@@ -278,6 +280,11 @@ export default function AnalysisPage() {
   const [topicSearch, setTopicSearch] = useState("");
   const [strengthFilter, setStrengthFilter] = useState("ALL");
 
+  const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiContent, setAiContent] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+
   const recentSolved = platformStats?.recentSolvedQuestions || [];
   const allQuestions = platformStats?.accumulatedSolvedQuestions || [];
 
@@ -288,6 +295,29 @@ export default function AnalysisPage() {
     setTopicSearch("");
     setStrengthFilter("ALL");
   }, [platform]);
+
+  const generateAiInsights = async () => {
+    setAiPanelOpen(true);
+    setAiLoading(true);
+    setAiError(null);
+    setAiContent(null);
+
+    try {
+      const topTopics = dynamicTopicData.slice(0, 5);
+      const weakTopics = dynamicTopicData.slice().reverse().slice(0, 5);
+
+      const res = await api.post("/ai/analyze-topics", {
+        platform,
+        topTopics,
+        weakTopics
+      });
+      setAiContent(res.data.data.analysis);
+    } catch (err: any) {
+      setAiError(err.response?.data?.message || err.message || "Failed to generate AI insights.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   useEffect(() => {
     setAnalysisPage(1);
@@ -314,7 +344,7 @@ export default function AnalysisPage() {
 
     const topicsMap: { [key: string]: { subject: string; easySolved: number; mediumSolved: number; hardSolved: number; total: number } } = {};
 
-    allQuestions.forEach((q: any) => {
+    recentSolved.forEach((q: any) => {
       const diff = (q.difficulty || "medium").toLowerCase();
       const tags = q.topicTags || [];
 
@@ -375,9 +405,9 @@ export default function AnalysisPage() {
       });
     }
     if (!selectedTopic) {
-      return allQuestions;
+    return recentSolved;
     }
-    return allQuestions.filter((q: any) =>
+    return recentSolved.filter((q: any) =>
       q.topicTags?.some((tag: any) => {
         const name = tag.name
           .split(" ")
@@ -416,7 +446,7 @@ export default function AnalysisPage() {
       : "Recently Updated Repositories"
     : selectedTopic
       ? `Solved Problems: ${selectedTopic} (${filteredQuestions.length})`
-      : `All Solved Problems (${allQuestions.length})`;
+      : `Recently Solved Problems (${recentSolved.length})`;
 
   // Format date helper
   const formatDate = (val: string | number) => {
@@ -437,18 +467,38 @@ export default function AnalysisPage() {
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-8 pb-12 overflow-hidden">
+      <AiInsightsPanel 
+        isOpen={aiPanelOpen}
+        onClose={() => setAiPanelOpen(false)}
+        loading={aiLoading}
+        content={aiContent}
+        error={aiError}
+      />
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4"
+        className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-blueprint-blue text-white flex items-center justify-center font-sketch text-3xl rough-border-blue transform -rotate-6 shadow-[4px_4px_0px_#171717]">
-            <Brain size={28} />
-          </div>
-          <h1 className="font-sketch text-4xl md:text-5xl text-sketch-black">Code Analysis</h1>
+        <div>
+          <h1 className="font-sketch text-4xl text-sketch-black flex items-center gap-3">
+            <Brain size={32} className="text-blueprint-blue" />
+            Topics Covered Recently
+          </h1>
+          <p className="font-mono text-sketch-black/60 mt-1">
+            Overview of algorithmic topics from your recently solved problems.
+          </p>
         </div>
+        {hasConnections && dynamicTopicData.length > 0 && (
+          <button 
+            onClick={generateAiInsights}
+            className="flex items-center gap-2 px-4 py-2 bg-blueprint-blue text-white font-mono font-bold text-sm border-2 border-sketch-black shadow-[4px_4px_0px_#171717] hover:-translate-y-1 hover:shadow-[6px_6px_0px_#171717] transition-all cursor-pointer"
+          >
+            <Sparkles size={16} />
+            Generate AI Insights
+          </button>
+        )}
       </motion.div>
 
       {!hasConnections ? (

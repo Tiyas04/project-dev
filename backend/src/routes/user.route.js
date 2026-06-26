@@ -13,7 +13,8 @@ import {
     unfollowUser,
     searchUsers,
     getFollowersList,
-    getFollowingList
+    getFollowingList,
+    getFriendsList
 } from "../controllers/user.controller.js";
 import { verifyJWT, optionalJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -40,10 +41,11 @@ router.route("/update-account").patch(verifyJWT, updateAccountDetails);
 router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 
 // Public profile and social routes
-router.route("/search").get(searchUsers);
+router.route("/search").get(verifyJWT, searchUsers);
 router.route("/profile/:username").get(optionalJWT, getPublicProfile);
 router.route("/profile/:username/followers").get(optionalJWT, getFollowersList);
 router.route("/profile/:username/following").get(optionalJWT, getFollowingList);
+router.route("/profile/:username/friends").get(verifyJWT, getFriendsList);
 router.route("/follow/:username").post(verifyJWT, followUser);
 router.route("/unfollow/:username").post(verifyJWT, unfollowUser);
 

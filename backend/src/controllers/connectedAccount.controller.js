@@ -9,6 +9,8 @@ import {
     fetchCodeforcesStats,
     fetchGitHubStats,
 } from "../utils/platformFetchers.js";
+import { updateArenaScore } from "../utils/arenaScore.util.js";
+import { Activity } from "../models/activity.model.js";
 
 /**
  * Connect a platform profile with username and run initial sync
@@ -55,6 +57,15 @@ const connectPlatform = asyncHandler(async (req, res) => {
         },
         { new: true, upsert: true }
     );
+
+    await updateArenaScore(req.user._id);
+
+    await Activity.create({
+        user: req.user._id,
+        type: 'ACCOUNT_LINKED',
+        platform: normalizedPlatform,
+        metadata: { username }
+    });
 
     // Fetch and enrich user for response
     const dbUser = await User.findById(req.user._id);
@@ -105,6 +116,8 @@ const disconnectPlatform = asyncHandler(async (req, res) => {
             },
         }
     );
+
+    await updateArenaScore(req.user._id);
 
     const dbUser = await User.findById(req.user._id);
     const enrichedUser = await enrichUser(dbUser);
@@ -160,6 +173,7 @@ const syncAllPlatforms = asyncHandler(async (req, res) => {
             { user: req.user._id },
             { $set: updateFields }
         );
+        await updateArenaScore(req.user._id);
     }
 
     const dbUser = await User.findById(req.user._id);
