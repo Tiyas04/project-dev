@@ -191,24 +191,6 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* AI Assistant Banner */}
-      <section className="bg-blueprint-blue text-white p-6 md:p-8 border-2 border-sketch-black shadow-[6px_6px_0px_#171717] flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
-        <div className="relative z-10 space-y-3 max-w-3xl">
-          <h2 className="font-sketch text-2xl flex items-center gap-2">
-            <MessageSquare size={24} />
-            DevArena AI Assistant (Coming Soon)
-          </h2>
-          <p className="font-mono text-white/80 text-sm leading-relaxed">
-            Phase 6 introduces our new AI integration! Soon you'll be able to get personalized feedback on your code, interview preparation plans based on your stats, and resume analysis directly on your dashboard.
-          </p>
-        </div>
-        <button disabled className="relative z-10 px-6 py-3 bg-white text-blueprint-blue font-bold font-mono text-sm border-2 border-sketch-black shadow-[4px_4px_0px_#171717] opacity-70 cursor-not-allowed whitespace-nowrap">
-          Access AI Tools
-        </button>
-        <div className="absolute right-0 bottom-0 text-[100px] text-white/10 font-sketch pointer-events-none transform -translate-y-4">
-          AI
-        </div>
-      </section>
 
       {!hasConnections ? (
         <section className="bg-white p-8 rough-border shadow-[8px_8px_0px_#171717] flex flex-col items-center text-center space-y-6">

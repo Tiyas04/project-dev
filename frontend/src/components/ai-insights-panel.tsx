@@ -1,6 +1,6 @@
 import React from "react";
-import ReactMarkdown from "react-markdown";
-import { Sparkles, Brain, X, Loader2 } from "lucide-react";
+import { CustomMarkdown } from "./custom-markdown";
+import { Sparkles, Brain, X, Loader2, RotateCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface AiInsightsPanelProps {
@@ -9,9 +9,10 @@ interface AiInsightsPanelProps {
   loading: boolean;
   content: string | null;
   error: string | null;
+  onReload?: () => void;
 }
 
-export function AiInsightsPanel({ isOpen, onClose, loading, content, error }: AiInsightsPanelProps) {
+export function AiInsightsPanel({ isOpen, onClose, loading, content, error, onReload }: AiInsightsPanelProps) {
   if (!isOpen) return null;
 
   return (
@@ -30,12 +31,23 @@ export function AiInsightsPanel({ isOpen, onClose, loading, content, error }: Ai
               <Sparkles size={24} />
               AI Topic Insights
             </div>
-            <button 
-              onClick={onClose}
-              className="p-1 hover:bg-white/20 transition-colors"
-            >
-              <X size={24} />
-            </button>
+            <div className="flex items-center gap-2">
+              {onReload && !loading && (
+                <button
+                  onClick={onReload}
+                  className="p-1 hover:bg-white/20 transition-colors cursor-pointer rounded flex items-center justify-center"
+                  title="Regenerate Insights"
+                >
+                  <RotateCw size={18} />
+                </button>
+              )}
+              <button 
+                onClick={onClose}
+                className="p-1 hover:bg-white/20 transition-colors cursor-pointer rounded"
+              >
+                <X size={24} />
+              </button>
+            </div>
           </div>
 
           {/* Body */}
@@ -47,19 +59,29 @@ export function AiInsightsPanel({ isOpen, onClose, loading, content, error }: Ai
                 <p className="text-xs">Generating your personalized roadmap</p>
               </div>
             ) : error ? (
-              <div className="bg-red-50 border-2 border-red-500 p-6 text-center text-red-700 shadow-[4px_4px_0px_#ef4444]">
+              <div className="bg-red-50 border-2 border-red-500 p-6 text-center text-red-700 shadow-[4px_4px_0px_#ef4444] rounded">
                 <p className="font-bold mb-2">Analysis Failed</p>
                 <p>{error}</p>
-                <button 
-                  onClick={onClose}
-                  className="mt-4 px-4 py-2 bg-red-600 text-white font-bold hover:-translate-y-0.5 transition-transform border-2 border-sketch-black shadow-[2px_2px_0px_#171717]"
-                >
-                  Close
-                </button>
+                <div className="flex items-center justify-center gap-4 mt-4">
+                  {onReload && (
+                    <button
+                      onClick={onReload}
+                      className="px-4 py-2 bg-blueprint-blue text-white font-bold hover:-translate-y-0.5 transition-transform border-2 border-sketch-black shadow-[2px_2px_0px_#171717] cursor-pointer"
+                    >
+                      Retry
+                    </button>
+                  )}
+                  <button 
+                    onClick={onClose}
+                    className="px-4 py-2 bg-red-600 text-white font-bold hover:-translate-y-0.5 transition-transform border-2 border-sketch-black shadow-[2px_2px_0px_#171717] cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             ) : content ? (
-              <div className="prose prose-sm max-w-none prose-headings:font-sketch prose-headings:text-blueprint-blue prose-h3:text-2xl prose-a:text-blueprint-blue prose-a:font-bold prose-strong:text-sketch-black">
-                <ReactMarkdown>{content}</ReactMarkdown>
+              <div className="prose prose-sm max-w-none">
+                <CustomMarkdown content={content} />
               </div>
             ) : (
               <div className="text-center py-10 text-sketch-black/50">
