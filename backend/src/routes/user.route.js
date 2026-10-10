@@ -18,6 +18,7 @@ import {
 } from "../controllers/user.controller.js";
 import { verifyJWT, optionalJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import { cacheResponse } from "../middlewares/cache.middleware.js";
 
 const router = Router();
 
@@ -42,9 +43,9 @@ router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateU
 
 // Public profile and social routes
 router.route("/search").get(verifyJWT, searchUsers);
-router.route("/profile/:username").get(optionalJWT, getPublicProfile);
-router.route("/profile/:username/followers").get(optionalJWT, getFollowersList);
-router.route("/profile/:username/following").get(optionalJWT, getFollowingList);
+router.route("/profile/:username").get(optionalJWT, cacheResponse(180), getPublicProfile);
+router.route("/profile/:username/followers").get(optionalJWT, cacheResponse(120), getFollowersList);
+router.route("/profile/:username/following").get(optionalJWT, cacheResponse(120), getFollowingList);
 router.route("/profile/:username/friends").get(verifyJWT, getFriendsList);
 router.route("/follow/:username").post(verifyJWT, followUser);
 router.route("/unfollow/:username").post(verifyJWT, unfollowUser);

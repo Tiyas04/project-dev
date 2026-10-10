@@ -18,7 +18,7 @@ DevArena is an AI-powered Competitive Programming Analytics Platform that helps 
 | Phase 6 — Social Features                | ✅ Complete     | 100%       |
 | Phase 7 — Public Profiles & Achievements | ✅ Complete     | 100%       |
 | Phase 8 — AI Features                    | ✅ Complete     | 100%       |
-| Phase 9 — Background Jobs & Automation   | ⏳ Planned      | 0%         |
+| Phase 9 — Background Jobs & Automation   | ✅ Complete     | 100%       |
 
 ---
 
@@ -256,105 +256,80 @@ Implemented achievement visualizations:
 
 ---
 
-## Phase 9 — Background Jobs ⏳
+## Phase 9 — Background Jobs & Cache Controlling ✅
 
-### Planned Features
+### Completed Features
 
-* Redis Integration
-* BullMQ Queues
-* Automated Data Sync
-* Arena Score Recalculation
-* Achievement Processing
-* Scheduled Analytics Generation
+* [x] **Redis & Cache Infrastructure**:
+  * Redis client connection manager (`config/redis.js`) supporting standard Redis, Upstash (`rediss://`), and graceful in-memory fallback.
+  * Resilient cache service (`services/cache.service.js`) with non-blocking SCAN pattern matching, TTL expiration, cache-aside (`getOrSet`), cache flushing, and live diagnostic metrics.
+  * Express cache controlling middleware (`middlewares/cache.middleware.js`) injecting `X-DevArena-Cache: HIT / MISS` headers and handling `Cache-Control: no-cache` bypasses.
+  * High-performance caching enabled on global & friends leaderboards, public profile view, followers, and following lists.
+  * Automated granular cache invalidation on profile updates, platform connections/disconnections, and social follow actions.
+  * Cache administration endpoints: `GET /api/v1/cache/status`, `POST /api/v1/cache/clear`, `POST /api/v1/cache/warmup`.
 
----
+* [x] **BullMQ Background Queues & Workers**:
+  * Initialized modular BullMQ queues (`jobs/queues.js`) for `DATA_SYNC`, `ANALYTICS`, `ACHIEVEMENT`, and `SCHEDULED` tasks with exponential backoffs, concurrency limits, and in-memory async fallback runners.
+  * `dataSyncWorker`: Processes user platform statistics synchronization in the background without blocking HTTP requests.
+  * `analyticsWorker`: Asynchronously recalculates unified Arena Scores and invalidates leaderboard caches.
+  * `achievementWorker`: Executes the achievement engine, records unlocked milestones, and emits feed activities.
+  * `scheduledWorker`: Sweeps connected user accounts periodically with staggered job scheduling to prevent API throttling.
+  * Background job management API (`controllers/job.controller.js` & `routes/job.route.js`): `GET /api/v1/jobs/status`, `POST /api/v1/jobs/sync-now`, `POST /api/v1/jobs/sync-all`, `POST /api/v1/jobs/check-achievements`.
 
-# Immediate Development Priorities
+* [x] **Automated Achievement System (Backend & Engine)**:
+  * Persistent MongoDB `Achievement` model (`models/achievement.model.js`) indexed with compound unique constraint on `(user, badgeId)`.
+  * Comprehensive 22-badge evaluation catalogue (`services/achievement.service.js`) spanning LeetCode, Codeforces, GitHub, and DevArena unified milestones.
+  * Automatic `Activity` feed generation (`MILESTONE_REACHED`) upon achievement unlock.
+  * Achievement endpoints: `GET /api/v1/achievements/my`, `GET /api/v1/achievements/user/:username`, `POST /api/v1/achievements/check`.
 
-## Priority 1 — Redis & BullMQ Infrastructure (Phase 9)
-
-Establish a local and production Redis instance and set up the BullMQ queue manager to handle background processing asynchronously.
-
-Tasks:
-
-* [ ] Provision Redis instance (local + cloud production environment)
-* [ ] Initialize BullMQ connection manager in backend setup
-* [ ] Create reusable worker class templates for modular task handling
-
----
-
-## Priority 2 — Automated Platform Data Synchronization (Phase 9)
-
-Set up scheduled background synchronization jobs to keep LeetCode, Codeforces, and GitHub stats updated without requiring manual sync trigger.
-
-Tasks:
-
-* [ ] Define background queue structures for stats retrieval
-* [ ] Schedule synchronization intervals (e.g. daily/weekly cron rules)
-* [ ] Handle API rate limits, backoff strategies, and retry queues gracefully
+* [x] **Frontend Integration**:
+  * Dashboard dynamically loads verified unlocked achievements directly from `/api/v1/achievements/my` with fallback resilience.
+  * Added "Queue Worker" button to trigger asynchronous BullMQ jobs alongside standard sync.
+  * Live status notifications for cache updates and background job enqueueing.
 
 ---
 
-## Priority 3 — Background calculations & unlocks (Phase 9)
-
-Leverage asynchronous jobs to process heavier statistics calculations like Arena Score updates and automated achievement unlock checking.
-
-Tasks:
-
-* [ ] Queue Arena Score recalculations on successful platform sync events
-* [ ] Set up asynchronous achievement checker workers to process unlocked milestones
-* [ ] Generate and cache dynamic statistics charts periodically in the background
-
----
-
-# Current Architecture
+# Architecture Summary
 
 Frontend
 
 ```text
-Next.js
+Next.js 16 (App Router)
 │
-├── Dashboard
-├── Analytics
-├── Achievements
-├── Profile
+├── Dashboard (KPIs, Charts, Badges, Background Queue trigger)
+├── Analytics (Radar topic analysis, solve breakdowns)
+├── Leaderboard (Global & Friends rankings with Redis caching)
+├── AI Coach (Roadmaps & Chat)
+├── Public Profiles (Coder ID card, Achievements, Activity feed)
 └── Authentication
 ```
 
 Backend
 
 ```text
-Express.js
+Express.js + Node.js
 │
-├── Auth Module
-├── User Module
-├── Account Module
-├── Analytics Module
-└── AI Module
+├── Cache Controller (Redis / Upstash / In-memory fallback)
+├── Background Queue Manager (BullMQ: DataSync, Analytics, Achievements, Crons)
+├── Platform Fetchers (LeetCode, Codeforces, GitHub)
+├── Achievement Engine (22 Automated Rules)
+├── Auth, User, Accounts, Social & Leaderboard Modules
+└── AI Module (Gemini with load-spike fallback)
 ```
 
-Database
+Database & Caching
 
 ```text
-MongoDB
+MongoDB Atlas + Redis (Upstash / Local)
 │
-├── Users
-├── ConnectedAccounts
-├── Contests
-├── Problems
-├── Analytics
-└── Achievements
+├── Users & ConnectedAccounts
+├── Achievements (Persistent unlocked badges)
+├── Activities & Follows
+└── Redis Caches (devarena:* keys with pattern invalidation)
 ```
 
 ---
 
-# Next Major Milestone
+# Milestone Completion
 
-🎯 Goal: Implement Background Jobs & Automation (Phase 9)
-
-Expected Deliverables:
-
-* Redis integration and BullMQ queue setup
-* Automated background synchronization jobs for LeetCode, Codeforces, and GitHub stats
-* Periodic Arena Score recalculations
-* Achievement processing triggers on background events
+🎉 **Phase 9 (Background Jobs & Cache Controlling) is 100% complete!** DevArena is now fully equipped with asynchronous job queues, automated platform sync sweeps, unified achievement verification, and low-latency Redis caching.

@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Trophy, TrendingUp, Code2, Medal, Target, Activity, Flame, RefreshCw, MessageSquare } from "lucide-react";
+import { Trophy, TrendingUp, Code2, Medal, Target, Activity, Flame, RefreshCw, MessageSquare, Zap, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import api from "@/lib/axios";
 import Link from "next/link";
 import { ActivityFeed } from "@/components/activity-feed";
 
@@ -10,7 +11,10 @@ export default function Dashboard() {
   const { user, syncUserStats } = useAuth();
   const [platform, setPlatform] = useState<"LeetCode" | "Codeforces" | "GitHub">("LeetCode");
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isQueueing, setIsQueueing] = useState(false);
+  const [syncStatusMsg, setSyncStatusMsg] = useState("");
   const [syncError, setSyncError] = useState("");
+  const [backendAchievements, setBackendAchievements] = useState<any[]>([]);
 
   const hasConnections = !!(user?.leetcode || user?.codeforces || user?.github);
 
@@ -27,17 +31,55 @@ export default function Dashboard() {
     }
   }, [user]);
 
+  // Fetch verified achievements from backend
+  useEffect(() => {
+    if (user) {
+      api.get("/achievements/my")
+        .then((res) => {
+          if (res.data?.data?.achievements) {
+            setBackendAchievements(res.data.data.achievements);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [user]);
+
   const handleSync = async () => {
     setIsSyncing(true);
     setSyncError("");
+    setSyncStatusMsg("");
     try {
       await syncUserStats();
+      // Re-fetch achievements after sync
+      const achRes = await api.get("/achievements/my");
+      if (achRes.data?.data?.achievements) {
+        setBackendAchievements(achRes.data.data.achievements);
+      }
+      setSyncStatusMsg("Synced & cached!");
+      setTimeout(() => setSyncStatusMsg(""), 3500);
     } catch (err: any) {
       console.error(err);
       setSyncError("Sync failed. Try again.");
       setTimeout(() => setSyncError(""), 4000);
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const handleBackgroundQueue = async () => {
+    setIsQueueing(true);
+    setSyncStatusMsg("");
+    setSyncError("");
+    try {
+      const res = await api.post("/jobs/sync-now");
+      setSyncStatusMsg("Enqueued in BullMQ background worker!");
+      setTimeout(() => setSyncStatusMsg(""), 4000);
+    } catch (err: any) {
+      console.error(err);
+      setSyncError("Failed to queue background job.");
+      setTimeout(() => setSyncError(""), 4000);
+    } finally {
+      setIsQueueing(false);
     }
   };
 
@@ -83,7 +125,21 @@ export default function Dashboard() {
   const platformStats = user?.stats?.[platform.toLowerCase() as keyof typeof user.stats] as any;
 
   const getAchievements = () => {
-    const list: { title: string; desc: string; date: string }[] = [];
+    // Priority: use verified achievements fetched from backend API & Redis cache
+    const platformLower = platform.toLowerCase();
+    const serverBadges = backendAchievements.filter(
+      (a) => a.platform?.toLowerCase() === platformLower && a.unlocked
+    );
+    if (serverBadges.length > 0) {
+      return serverBadges.map((b) => ({
+        title: b.title,
+        desc: b.description,
+        date: b.unlockedAt ? new Date(b.unlockedAt).toLocaleDateString() : "UNLOCKED",
+        tier: b.tier,
+      }));
+    }
+
+    const list: { title: string; desc: string; date: string; tier?: string }[] = [];
     if (!platformStats) {
       return [{ title: "Platform Locked", desc: "Connect profile to start unlocking achievements.", date: "LOCKED" }];
     }
@@ -175,7 +231,7 @@ export default function Dashboard() {
         
         {/* Score Badge */}
         {hasConnections && (
-          <div className="relative z-10 flex flex-col items-center justify-center p-4 bg-blueprint-blue text-white border-2 border-sketch-black shadow-[4px_4px_0px_#171717] -rotate-2 shrink-0 min-w-[140px] hover:rotate-0 transition-transform cursor-default">
+          <div className="relative z-10 flex flex-col items-center justify-center p-4 bg-blueprint-blue text-white border-2 border-sketch-black shadow-[4px_4px_0px_#171717] -rotate-2 shrink-0 min-w-35 hover:rotate-0 transition-transform cursor-default">
             <Trophy size={24} className="mb-2" />
             <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">DevArena Score</span>
             <div className="flex items-end gap-1">
@@ -224,7 +280,7 @@ export default function Dashboard() {
                     : "bg-paper text-sketch-black rough-border hover:bg-gray-100"
                 }`}
               >
-                <Code2 size={14} className="sm:w-[18px] sm:h-[18px]" />
+                <Code2 size={14} className="sm:w-4.5 sm:h-4.5" />
                 {p}
               </button>
             ))}
@@ -235,18 +291,33 @@ export default function Dashboard() {
             <section>
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <h2 className="font-mono text-2xl font-bold text-sketch-black flex items-center gap-3">
-                  <span className="w-8 h-[3px] bg-blueprint-blue inline-block"></span>
+                  <span className="w-8 h-0.75 bg-blueprint-blue inline-block"></span>
                   Overview ({platform})
                 </h2>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   {syncError && <span className="text-xs font-mono text-red-500 font-bold">{syncError}</span>}
+                  {syncStatusMsg && (
+                    <span className="flex items-center gap-1 text-xs font-mono text-green-700 bg-green-50 px-2 py-1 rough-border font-bold">
+                      <CheckCircle2 size={12} />
+                      {syncStatusMsg}
+                    </span>
+                  )}
                   <button
                     onClick={handleSync}
-                    disabled={isSyncing}
-                    className="flex items-center gap-2 px-4 py-2 bg-blueprint-blue text-white font-mono text-xs font-bold rough-border hover:-translate-y-0.5 transition-transform disabled:opacity-55 cursor-pointer shadow-[2px_2px_0px_#171717]"
+                    disabled={isSyncing || isQueueing}
+                    className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-blueprint-blue text-white font-mono text-xs font-bold rough-border hover:-translate-y-0.5 transition-transform disabled:opacity-55 cursor-pointer shadow-[2px_2px_0px_#171717]"
                   >
                     <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
                     {isSyncing ? "Syncing..." : "Sync Stats"}
+                  </button>
+                  <button
+                    onClick={handleBackgroundQueue}
+                    disabled={isSyncing || isQueueing}
+                    title="Queue asynchronous platform stats sync using BullMQ worker"
+                    className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-paper text-sketch-black font-mono text-xs font-bold rough-border hover:-translate-y-0.5 transition-transform disabled:opacity-55 cursor-pointer shadow-[2px_2px_0px_#171717] hover:bg-gray-100"
+                  >
+                    <Zap size={14} className={isQueueing ? "animate-bounce text-yellow-600" : "text-yellow-600"} />
+                    {isQueueing ? "Queuing..." : "Queue Worker"}
                   </button>
                 </div>
               </div>
@@ -300,7 +371,7 @@ export default function Dashboard() {
 
           {/* Recent Activity / Setup Call to Action */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rough-border shadow-[4px_4px_0px_#171717] h-full overflow-y-auto max-h-[400px]">
+            <div className="bg-white p-8 rough-border shadow-[4px_4px_0px_#171717] h-full overflow-y-auto max-h-100">
               <h3 className="font-mono text-xl font-bold text-sketch-black mb-6 flex justify-between items-center">
                 Friend Activity
                 <Link href="/leaderboard" className="text-blueprint-blue text-sm hover:underline">View Leaderboard &rarr;</Link>

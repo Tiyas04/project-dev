@@ -11,6 +11,8 @@ import {
 } from "../utils/platformFetchers.js";
 import { updateArenaScore } from "../utils/arenaScore.util.js";
 import { Activity } from "../models/activity.model.js";
+import { cacheService } from "../services/cache.service.js";
+import { queueAchievementCheck } from "../jobs/queues.js";
 
 /**
  * Connect a platform profile with username and run initial sync
@@ -59,6 +61,13 @@ const connectPlatform = asyncHandler(async (req, res) => {
     );
 
     await updateArenaScore(req.user._id);
+    await queueAchievementCheck(req.user._id);
+
+    // Invalidate caches
+    await cacheService.delPattern(`*${req.user.username}*`);
+    await cacheService.delPattern(`*user_${req.user._id}*`);
+    await cacheService.delPattern("leaderboard:*");
+    await cacheService.delPattern("route:/api/v1/leaderboard*");
 
     await Activity.create({
         user: req.user._id,
@@ -119,6 +128,12 @@ const disconnectPlatform = asyncHandler(async (req, res) => {
 
     await updateArenaScore(req.user._id);
 
+    // Invalidate caches
+    await cacheService.delPattern(`*${req.user.username}*`);
+    await cacheService.delPattern(`*user_${req.user._id}*`);
+    await cacheService.delPattern("leaderboard:*");
+    await cacheService.delPattern("route:/api/v1/leaderboard*");
+
     const dbUser = await User.findById(req.user._id);
     const enrichedUser = await enrichUser(dbUser);
 
@@ -174,6 +189,13 @@ const syncAllPlatforms = asyncHandler(async (req, res) => {
             { $set: updateFields }
         );
         await updateArenaScore(req.user._id);
+        await queueAchievementCheck(req.user._id);
+
+        // Invalidate caches
+        await cacheService.delPattern(`*${req.user.username}*`);
+        await cacheService.delPattern(`*user_${req.user._id}*`);
+        await cacheService.delPattern("leaderboard:*");
+        await cacheService.delPattern("route:/api/v1/leaderboard*");
     }
 
     const dbUser = await User.findById(req.user._id);

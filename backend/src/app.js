@@ -27,6 +27,9 @@ import connectedAccountRouter from "./routes/connectedAccount.route.js";
 import aiRouter from "./routes/ai.route.js";
 import leaderboardRouter from "./routes/leaderboard.route.js";
 import activityRouter from "./routes/activity.route.js";
+import cacheRouter from "./routes/cache.route.js";
+import jobRouter from "./routes/job.route.js";
+import achievementRouter from "./routes/achievement.route.js";
 
 // Keep-alive check endpoint
 app.get("/api/v1/ping", (req, res) => {
@@ -43,5 +46,8 @@ app.use("/api/v1/accounts", connectedAccountRouter);
 app.use("/api/v1/ai", aiRouter);
 app.use("/api/v1/leaderboard", leaderboardRouter);
 app.use("/api/v1/activity", activityRouter);
+app.use("/api/v1/cache", cacheRouter);
+app.use("/api/v1/jobs", jobRouter);
+app.use("/api/v1/achievements", achievementRouter);
 
 export default app;
