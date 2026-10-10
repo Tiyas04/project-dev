@@ -396,13 +396,13 @@ Generate detailed performance reports.
 
 ---
 
-## Phase 9: Background Jobs
+## Phase 9: Background Jobs & Cache Controlling ✅
 
 ### BullMQ Jobs
 
 #### Sync User Data
 
-Runs periodically:
+Runs periodically & on-demand via background worker:
 
 * Fetch latest ratings
 * Update contests
@@ -410,7 +410,7 @@ Runs periodically:
 
 #### Analytics Generation
 
-Recalculate:
+Recalculate asynchronously:
 
 * Arena Score
 * Topic Scores
@@ -418,7 +418,7 @@ Recalculate:
 
 #### Achievement Engine
 
-Award badges automatically.
+Award badges automatically via 22 evaluation rules.
 
 ---
 

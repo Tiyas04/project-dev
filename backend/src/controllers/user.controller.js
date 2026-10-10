@@ -8,6 +8,8 @@ import { OAuth2Client } from "google-auth-library";
 import { enrichUser } from "../utils/userEnricher.js";
 import { Follow } from "../models/follow.model.js";
 import { ConnectedAccount } from "../models/connectedAccount.model.js";
+import { cacheService } from "../services/cache.service.js";
+import { queueAchievementCheck } from "../jobs/queues.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -270,6 +272,11 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     );
     const enrichedUser = await enrichUser(dbUser);
 
+    // Invalidate caches
+    await cacheService.delPattern(`*${req.user.username}*`);
+    await cacheService.delPattern(`*${dbUser.username}*`);
+    await cacheService.delPattern(`*user_${req.user._id}*`);
+
     console.log("user updated successfully")
     return res
         .status(200)
@@ -299,6 +306,10 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         { new: true }
     );
     const enrichedUser = await enrichUser(dbUser);
+
+    // Invalidate caches
+    await cacheService.delPattern(`*${dbUser.username}*`);
+    await cacheService.delPattern(`*user_${req.user._id}*`);
 
     const message = avatarBuffer 
         ? "Avatar image updated successfully" 
@@ -447,6 +458,15 @@ const followUser = asyncHandler(async (req, res) => {
         following: userToFollow._id
     });
 
+    // Invalidate caches for both follower and followed
+    await cacheService.delPattern(`*${req.user.username}*`);
+    await cacheService.delPattern(`*${userToFollow.username}*`);
+    await cacheService.delPattern(`*user_${req.user._id}*`);
+    await cacheService.delPattern(`*user_${userToFollow._id}*`);
+
+    // Check achievement for gaining a follower
+    await queueAchievementCheck(userToFollow._id.toString());
+
     return res
         .status(200)
         .json(new ApiResponse(200, {}, "Successfully followed user"));
@@ -472,6 +492,12 @@ const unfollowUser = asyncHandler(async (req, res) => {
     if (deleteResult.deletedCount === 0) {
         throw new ApiError(400, "You are not following this user");
     }
+
+    // Invalidate caches
+    await cacheService.delPattern(`*${req.user.username}*`);
+    await cacheService.delPattern(`*${userToUnfollow.username}*`);
+    await cacheService.delPattern(`*user_${req.user._id}*`);
+    await cacheService.delPattern(`*user_${userToUnfollow._id}*`);
 
     return res
         .status(200)
