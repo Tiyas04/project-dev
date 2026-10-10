@@ -116,21 +116,24 @@ Project Dev/
 
 ### Running the Application
 
-Start the development servers concurrently:
+Start both the backend and frontend development servers concurrently with a single command from the project root:
 
-**Backend:**
 ```bash
-cd backend
 npm run dev
 ```
 
-**Frontend:**
-```bash
-cd frontend
-npm run dev
-```
+This uses `concurrently` to launch:
+- **Backend API:** `http://localhost:5000` (prefixed with `[BACKEND]`)
+- **Frontend Web App:** `http://localhost:3000` (prefixed with `[FRONTEND]`)
 
-The application will be available at `http://localhost:3000`.
+Alternatively, you can run them individually:
+```bash
+# Run only backend
+npm run dev:backend
+
+# Run only frontend
+npm run dev:frontend
+```
 
 ---
 
