@@ -34,9 +34,14 @@ The platform aggregates data from multiple coding platforms and transforms raw s
 * Redis
 * BullMQ
 
-## AI
+## AI & RAG Engine (Python Microservice)
 
-* Gemini API
+* Python 3.11+
+* FastAPI & Uvicorn
+* LangChain / LlamaIndex
+* ChromaDB / FAISS (Vector Database)
+* Hugging Face Embeddings / Sentence-Transformers
+* Google GenAI SDK (Python) / Open-source LLMs
 
 ## Deployment
 
@@ -422,6 +427,51 @@ Award badges automatically via 22 evaluation rules.
 
 ---
 
+## Phase 10: Python AI & RAG Engine ✅ (Complete)
+
+### Python Microservice Architecture
+* **FastAPI Service (`ai-service/`)**:
+  * Asynchronous endpoints running on Uvicorn (default: port 8000).
+  * Streaming responses via Server-Sent Events (SSE) for token-by-token coach responses.
+  * Internal API authentication with Express backend (`/api/v1/ai/*` proxies to Python service).
+  * Managed via root `concurrently` script alongside frontend and backend.
+
+### RAG Knowledge Base & Vector Store
+* **Curated Competitive Programming Corpus**:
+  * Algorithmic design patterns & templates (DP states, Graph traversals, Range Queries, Binary Search, Math & Combinatorics).
+  * Problem metadata, taxonomies, and editorial hints from LeetCode, Codeforces, and CSES.
+  * Common pitfalls, edge cases, and algorithmic complexity benchmarks.
+* **Vector Indexing Engine**:
+  * Vector Database: ChromaDB / FAISS for dense vector indexing and low-latency nearest-neighbor search.
+  * Embeddings: Hugging Face `sentence-transformers` (e.g., `all-MiniLM-L6-v2`) or Google GenAI embeddings.
+  * Chunking and metadata enrichment strategy (difficulty brackets, topic tags, source platforms).
+
+### Context-Aware Retrieval Pipeline
+* **User Context Augmentation**:
+  * Dynamic ingestion of user's live profile: current ratings, Arena Score, topic mastery radar vector, recent contest misses.
+  * Hybrid retrieval combining dense vector similarity with metadata filtering (matching user difficulty frontier and target weak topics).
+  * Context re-ranking to prioritize algorithms tailored to the user's specific skill level.
+
+### Intelligent Deliverables
+#### 1. RAG-Powered AI Coach
+* Grounded conversational mentor referencing actual algorithmic patterns and problem corpora instead of generic hallucinations.
+* Guided problem-solving assistance without spoiling code solutions.
+
+#### 2. 4-Tier Progressive Hint System
+* Generates progressive nudges on demand:
+  1. *Conceptual Intuition* (High-level perspective)
+  2. *Algorithmic Pattern* (e.g., Prefix Sums vs Sliding Window)
+  3. *Key Observation & Invariant* (Crucial structural insight)
+  4. *Edge Cases & Complexity Benchmarks* (Target constraints and boundary inputs)
+
+#### 3. Dynamic Curated Study Planner
+* Generates personalized study roadmaps grounded in real, indexed problem sets matched to user's rating gaps.
+
+#### 4. Contest Post-Mortem Diagnostics
+* Ingests contest submissions and analyzes where the user struggled, diagnosing failure modes (TLE, WA, edge cases) and prescribing targeted recovery practice.
+
+---
+
 ## Database Design
 
 ### Collections
@@ -501,6 +551,31 @@ backend
 
 ---
 
+## AI Service (Python FastAPI & RAG)
+
+```text
+ai-service
+|
+├── app
+│   ├── api
+│   │   ├── coach.py
+│   │   ├── hints.py
+│   │   └── planner.py
+│   ├── rag
+│   │   ├── vector_store.py
+│   │   ├── retriever.py
+│   │   ├── embeddings.py
+│   │   └── chains.py
+│   ├── data
+│   │   ├── dsa_patterns/
+│   │   └── problem_corpus/
+│   └── main.py
+├── requirements.txt
+└── Dockerfile
+```
+
+---
+
 # MVP Deliverables
 
 ## Version 1.0
@@ -523,15 +598,19 @@ backend
 * Arena Score
 * Achievements
 * Notifications
+* Redis Cache Controlling
+* BullMQ Background Jobs & Automated Sync
 
 ---
 
-# Version 3.0
+# Version 3.0 (Python AI & RAG Engine ✅)
 
-* AI Coach
-* AI Study Plans
-* AI Contest Reviews
-* Smart Recommendations
+* Dedicated Python AI & RAG Microservice (FastAPI)
+* Curated DSA Knowledge Base & Vector Indexing (ChromaDB / FAISS)
+* Grounded RAG-Powered AI Coach (No hallucinations)
+* Progressive 4-Tier Problem Hint Engine
+* Dynamic Curated Study Plans & Problem Recommendations
+* Algorithmic Contest Post-Mortem Diagnostics
 
 ---
 

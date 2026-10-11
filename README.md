@@ -36,7 +36,13 @@ DevArena is a comprehensive analytics dashboard and developer portfolio tracker.
 - **Authentication:** JWT, Google OAuth
 - **Database:** MongoDB Atlas, Mongoose
 - **Caching & Queueing:** Redis, BullMQ
-- **Media & AI:** Cloudinary, Gemini API
+- **Media:** Cloudinary
+
+### AI & RAG Microservice
+- **Framework:** Python, FastAPI, Uvicorn
+- **Supported Providers:** Google Gemini, Groq (LPUs), OpenAI ChatGPT, Anthropic Claude
+- **RAG Architecture:** In-Memory Vector Search, Curated DSA Patterns & Problem Corpus
+- **Features:** Socratic AI Coach, 3-Tier Progressive Hints, Adaptive Study Planner, Contest Review
 
 ---
 
@@ -44,11 +50,19 @@ DevArena is a comprehensive analytics dashboard and developer portfolio tracker.
 
 ```text
 Project Dev/
+├── ai-service/           # FastAPI Python AI & RAG Microservice
+│   ├── app/
+│   │   ├── api/          # Coach, Hints, Planner, Review endpoints
+│   │   ├── data/         # DSA patterns & problem corpus
+│   │   └── rag/          # Vector store, embeddings, retriever, chains
+│   ├── requirements.txt  # Python dependencies
+│   └── run.py            # Startup runner
 ├── backend/              # Express Node.js backend server
 │   ├── src/
 │   │   ├── controllers/  # Route controller handlers
 │   │   ├── models/       # Mongoose schemas
 │   │   ├── routes/       # API endpoint routes
+│   │   ├── services/     # RAG client, caching, achievements
 │   │   ├── middlewares/  # Authentication & upload middlewares
 │   │   └── utils/        # Platform API fetchers & keep-alive pinger
 │   └── package.json
@@ -114,9 +128,28 @@ Project Dev/
    NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_oauth_client_id
    ```
 
+4. **Configure the AI & RAG Microservice**
+   ```bash
+   cd ../ai-service
+   python -m venv .venv
+   # Windows:
+   .venv\Scripts\Activate.ps1
+   # Linux/macOS:
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+   Create a `.env` file in `ai-service/`:
+   ```env
+   PORT=8000
+   HOST=0.0.0.0
+   GEMINI_API_KEY=your_gemini_api_key
+   INTERNAL_AI_SECRET=devarena_rag_secret_key_2026
+   DEFAULT_MODEL=gemini-3.8-flash
+   ```
+
 ### Running the Application
 
-Start both the backend and frontend development servers concurrently with a single command from the project root:
+Start all three services concurrently with a single command from the project root:
 
 ```bash
 npm run dev
@@ -125,6 +158,7 @@ npm run dev
 This uses `concurrently` to launch:
 - **Backend API:** `http://localhost:5000` (prefixed with `[BACKEND]`)
 - **Frontend Web App:** `http://localhost:3000` (prefixed with `[FRONTEND]`)
+- **AI & RAG Microservice:** `http://localhost:8000` (prefixed with `[AI_RAG]`)
 
 Alternatively, you can run them individually:
 ```bash
@@ -133,6 +167,9 @@ npm run dev:backend
 
 # Run only frontend
 npm run dev:frontend
+
+# Run only AI microservice
+npm run dev:ai
 ```
 
 ---

@@ -1,0 +1,310 @@
+[
+  {
+    "id": "sliding-window-dynamic",
+    "name": "Dynamic Size Sliding Window",
+    "category": "Arrays & Strings",
+    "difficulty_bracket": "800-1500",
+    "core_invariant": "Window [L, R] maintains a monotonic condition (e.g., sum <= K, unique chars). Expand R to satisfy or explore, shrink L as soon as condition is violated.",
+    "time_complexity": "O(N)",
+    "space_complexity": "O(1) or O(K) for frequency table",
+    "problem_signatures": [
+      "Find longest/shortest contiguous subarray/substring satisfying condition",
+      "Subarray with sum at most K with non-negative elements",
+      "Substrings containing at most K distinct elements"
+    ],
+    "hints": {
+      "tier1_intuition": "Notice that elements are contiguous and expanding the right endpoint monotonically increases the property (e.g. sum or frequency). When the constraint breaks, advancing the left endpoint monotonically restores validity.",
+      "tier2_pattern": "Dynamic Sliding Window with two pointers: initialize left=0, expand right from 0 to N-1, adding elements into a state counter. While the state is invalid, shrink from left.",
+      "tier3_invariant": "At the start of every iteration after the inner while loop finishes, the window [left, right] is guaranteed to be valid.",
+      "tier4_edge_cases": "Watch out for: negative numbers (which breaks monotonicity and requires Prefix Sum + Hash Map or Monotonic Deque instead), empty strings, and off-by-one window lengths (right - left + 1)."
+    },
+    "template": "left = 0\nstate = {}\nmax_len = 0\nfor right, val in enumerate(nums):\n    add_to_state(val)\n    while not is_valid(state):\n        remove_from_state(nums[left])\n        left += 1\n    max_len = max(max_len, right - left + 1)",
+    "common_traps": ["Applying sliding window when elements can be negative (fails monotonicity)", "Forgetting to update best answer inside/outside inner loop correctly"]
+  },
+  {
+    "id": "two-pointers-opposite",
+    "name": "Two Pointers (Opposite Direction)",
+    "category": "Arrays & Strings",
+    "difficulty_bracket": "800-1300",
+    "core_invariant": "Array is sorted or symmetric. left starts at 0, right starts at N-1. If sum < target, advance left; if sum > target, decrease right.",
+    "time_complexity": "O(N) (or O(N log N) if sorting is required)",
+    "space_complexity": "O(1)",
+    "problem_signatures": [
+      "Two Sum on sorted array",
+      "Container with Most Water",
+      "Palindrome verification or 3Sum reduction"
+    ],
+    "hints": {
+      "tier1_intuition": "Because the array is sorted, comparing elements at the opposite boundaries gives immediate directional certainty on whether to increase or decrease the target aggregate.",
+      "tier2_pattern": "Opposite-directional two pointers: `left=0`, `right=len(arr)-1`. Move pointers inwards until they meet.",
+      "tier3_invariant": "At step `(left, right)`, any pair involving an index `< left` or `> right` has already been explored or ruled out as suboptimal.",
+      "tier4_edge_cases": "Duplicates causing duplicate pairs (skip while nums[left] == nums[left+1]), strictly less vs less than equal bounds."
+    },
+    "template": "nums.sort()\nleft, right = 0, len(nums) - 1\nwhile left < right:\n    current_sum = nums[left] + nums[right]\n    if current_sum == target:\n        return [left, right]\n    elif current_sum < target:\n        left += 1\n    else:\n        right -= 1",
+    "common_traps": ["Off-by-one on left < right vs left <= right", "Skipping duplicates incorrectly in 3Sum variants"]
+  },
+  {
+    "id": "binary-search-monotonic-answer",
+    "name": "Binary Search on Monotonic Answer Space",
+    "category": "Search & Optimization",
+    "difficulty_bracket": "1200-1800",
+    "core_invariant": "Predicate check(X) is monotonic: false for all X < Ans, true for all X >= Ans (or vice versa). Search over the domain of answers rather than array indices.",
+    "time_complexity": "O(log(Range) * Cost(check))",
+    "space_complexity": "O(1)",
+    "problem_signatures": [
+      "Minimize the maximum (or maximize the minimum)",
+      "Koko Eating Bananas, Capacity to Ship Packages",
+      "Split Array Largest Sum, Aggressive Cows"
+    ],
+    "hints": {
+      "tier1_intuition": "Instead of constructing the optimal configuration directly, ask: 'Can we achieve a score of X?' If checking feasibility is easy and monotonic, binary search the answer range.",
+      "tier2_pattern": "Binary Search on Answer Space: define `check(mid)` returning boolean. Search range [low, high] where low is the minimal possible answer and high is the theoretical maximum.",
+      "tier3_invariant": "Maintain the invariant `check(high) == True` and `check(low - 1) == False`. The boundary between True and False converges to the optimal integer.",
+      "tier4_edge_cases": "Integer overflow during `(low + high) // 2` in C++ (use `low + (high - low) / 2`), setting initial `low` and `high` bounds too tightly."
+    },
+    "template": "def check(x):\n    # Return True if feasible with capacity/speed x\n    ...\n\nlow, high = 1, max_possible_value\nans = high\nwhile low <= high:\n    mid = low + (high - low) // 2\n    if check(mid):\n        ans = mid\n        high = mid - 1\n    else:\n        low = mid + 1\nreturn ans",
+    "common_traps": ["Setting search space bounds too narrow", "Infinite loop when low = mid or mid calculation rounds wrong"]
+  },
+  {
+    "id": "prefix-sums-and-hashmap",
+    "name": "Prefix Sums with Hash Map",
+    "category": "Arrays & Strings",
+    "difficulty_bracket": "1000-1600",
+    "core_invariant": "Subarray sum(i...j) = prefix[j+1] - prefix[i]. If prefix[j+1] - prefix[i] == K, then prefix[i] == prefix[j+1] - K.",
+    "time_complexity": "O(N)",
+    "space_complexity": "O(N)",
+    "problem_signatures": [
+      "Subarray Sum Equals K (with negative numbers)",
+      "Contiguous Array (equal number of 0s and 1s)",
+      "Subarray sums divisible by K"
+    ],
+    "hints": {
+      "tier1_intuition": "To find any subarray ending at index j with sum K, you need an earlier prefix with sum equal to current_prefix - K.",
+      "tier2_pattern": "Prefix sum state accumulators stored in a Hash Map mapping `prefix_sum -> count` (or first seen index).",
+      "tier3_invariant": "Initialize map with `{0: 1}` (or `{0: -1}` for index) to capture valid subarrays that start at index 0.",
+      "tier4_edge_cases": "Negative numbers (works cleanly with prefix sums unlike sliding window), modulo arithmetic when K is negative or modulus can be negative in C++."
+    },
+    "template": "seen = {0: 1}\ncurr_sum = 0\nans = 0\nfor x in nums:\n    curr_sum += x\n    if curr_sum - k in seen:\n        ans += seen[curr_sum - k]\n    seen[curr_sum] = seen.get(curr_sum, 0) + 1\nreturn ans",
+    "common_traps": ["Forgetting to initialize map with `{0: 1}`", "Overwriting index map when maximum subarray length is requested"]
+  },
+  {
+    "id": "monotonic-stack-nge",
+    "name": "Monotonic Stack (Next Greater / Smaller Element)",
+    "category": "Data Structures",
+    "difficulty_bracket": "1200-1700",
+    "core_invariant": "Stack elements maintain strict monotonicity (e.g. decreasing order). An incoming element smaller/larger triggers popping of elements that have met their match.",
+    "time_complexity": "O(N) amortized (each element pushed and popped at most once)",
+    "space_complexity": "O(N)",
+    "problem_signatures": [
+      "Next Greater Element, Daily Temperatures",
+      "Largest Rectangle in Histogram",
+      "Trapping Rain Water, Sum of Subarray Minimums"
+    ],
+    "hints": {
+      "tier1_intuition": "You need to find the nearest element to the left or right that is strictly greater or smaller. Store indices in a stack maintaining monotonic height.",
+      "tier2_pattern": "Monotonic Stack: as you iterate, pop from stack while top element violates monotonicity with current element.",
+      "tier3_invariant": "When element X pops element Y from a decreasing stack, X is the next greater element for Y.",
+      "tier4_edge_cases": "Elements remaining in the stack at the end (have no next greater element), circular arrays (run loop up to 2*N with index % N)."
+    },
+    "template": "stack = []  # store indices\nres = [-1] * len(nums)\nfor i, val in enumerate(nums):\n    while stack and nums[stack[-1]] < val:\n        idx = stack.pop()\n        res[idx] = val\n    stack.append(i)\nreturn res",
+    "common_traps": ["Storing values instead of indices when distances are needed", "Strict (<) vs non-strict (<=) comparisons causing duplicates"]
+  },
+  {
+    "id": "shortest-path-dijkstra",
+    "name": "Dijkstra's Shortest Path Algorithm",
+    "category": "Graph Theory",
+    "difficulty_bracket": "1300-1800",
+    "core_invariant": "Greedily settle the vertex with minimum tentative distance from priority queue. With non-negative edge weights, the distance is finalized once popped.",
+    "time_complexity": "O((V + E) log V)",
+    "space_complexity": "O(V + E)",
+    "problem_signatures": [
+      "Single-source shortest path with non-negative edge weights",
+      "Network Delay Time, Minimum Cost to Reach Destination",
+      "Shortest path on state graphs (e.g. node + remaining gas/keys)"
+    ],
+    "hints": {
+      "tier1_intuition": "Expand the frontier by exploring the currently closest reachable node. Because edge weights are non-negative, you can never find a shorter path to it later.",
+      "tier2_pattern": "Dijkstra with Min-Heap `(dist, u)`. Maintain `dist` array initialized to infinity. Discard stale heap entries if `d > dist[u]`.",
+      "tier3_invariant": "Whenever vertex `u` is extracted from the min-heap with minimal `d == dist[u]`, `dist[u]` is the exact global shortest path to `u`.",
+      "tier4_edge_cases": "Negative edge weights (Dijkstra fails! Use Bellman-Ford or SPFA), multi-dimensional state graphs where state is `(node, remaining_fuel)`."
+    },
+    "template": "import heapq\ndist = {node: float('inf') for node in graph}\ndist[src] = 0\npq = [(0, src)]\nwhile pq:\n    d, u = heapq.heappop(pq)\n    if d > dist[u]:\n        continue\n    for v, weight in graph[u]:\n        if dist[u] + weight < dist[v]:\n            dist[v] = dist[u] + weight\n            heapq.heappush(pq, (dist[v], v))",
+    "common_traps": ["Omitting `if d > dist[u]: continue` leading to TLE on dense graphs", "Negative cycles or negative edge weights"]
+  },
+  {
+    "id": "topological-sort-kahn",
+    "name": "Topological Sort (Kahn's In-Degree Algorithm)",
+    "category": "Graph Theory",
+    "difficulty_bracket": "1200-1600",
+    "core_invariant": "Only process nodes whose in-degree is 0 (all prerequisites satisfied). Decrement neighbors' in-degree. If final count < V, graph has a directed cycle.",
+    "time_complexity": "O(V + E)",
+    "space_complexity": "O(V + E)",
+    "problem_signatures": [
+      "Course Schedule I & II",
+      "Alien Dictionary, Sequence Reconstruction",
+      "Compile-order dependency resolution"
+    ],
+    "hints": {
+      "tier1_intuition": "Identify tasks with 0 prerequisites. Complete them, remove their outgoing dependencies, and see which new tasks become ready (in-degree drops to 0).",
+      "tier2_pattern": "Kahn's BFS: compute `in_degree` for every node. Push all nodes with `in_degree == 0` into a Queue. Dequeue, append to order, decrement neighbors' in-degrees.",
+      "tier3_invariant": "If the processed sequence has length < V at termination, there is at least one directed cycle.",
+      "tier4_edge_cases": "Disconnected graph components (handled naturally if all 0 in-degree nodes pushed), self-loops, multiple edges between same pair."
+    },
+    "template": "from collections import deque\nin_degree = [0] * n\nfor u, v in edges:\n    adj[u].append(v)\n    in_degree[v] += 1\nq = deque([i for i in range(n) if in_degree[i] == 0])\norder = []\nwhile q:\n    curr = q.popleft()\n    order.append(curr)\n    for nxt in adj[curr]:\n        in_degree[nxt] -= 1\n        if in_degree[nxt] == 0:\n            q.append(nxt)\nif len(order) != n: return [] # Cycle detected\nreturn order",
+    "common_traps": ["Not checking if all vertices were processed (cycle detection)", "Reversing edge directions accidentally in problem modeling"]
+  },
+  {
+    "id": "dsu-rank-compression",
+    "name": "Disjoint Set Union (DSU with Path Compression & Union by Rank)",
+    "category": "Data Structures",
+    "difficulty_bracket": "1100-1700",
+    "core_invariant": "Equivalence classes partition items into trees. Path compression flattens tree on `find`, rank/size keeps shallow depth on `union`.",
+    "time_complexity": "O(α(N)) amortized nearly O(1) per operation",
+    "space_complexity": "O(N)",
+    "problem_signatures": [
+      "Connected components in dynamic graph",
+      "Kruskal's MST algorithm",
+      "Redundant Connection, Accounts Merge, Number of Provinces"
+    ],
+    "hints": {
+      "tier1_intuition": "Instead of running DFS/BFS repeatedly when edges are added one by one, use a disjoint set structure to test if two vertices share the same representative root.",
+      "tier2_pattern": "DSU class with `parent` array and `rank` (or `size`) array. `find(i)` with path compression: `parent[i] = find(parent[i])`.",
+      "tier3_invariant": "`find(u) == find(v)` if and only if `u` and `v` are already in the same connected component.",
+      "tier4_edge_cases": "0-indexed vs 1-indexed elements, forgetting path compression leading to O(N) degenerated trees."
+    },
+    "template": "class DSU:\n    def __init__(self, n):\n        self.parent = list(range(n))\n        self.size = [1] * n\n    def find(self, i):\n        if self.parent[i] == i:\n            return i\n        self.parent[i] = self.find(self.parent[i])\n        return self.parent[i]\n    def union(self, i, j):\n        root_i = self.find(i)\n        root_j = self.find(j)\n        if root_i == root_j:\n            return False\n        if self.size[root_i] < self.size[root_j]:\n            root_i, root_j = root_j, root_i\n        self.parent[root_j] = root_i\n        self.size[root_i] += self.size[root_j]\n        return True",
+    "common_traps": ["Forgetting `parent[i] = find(parent[i])` (path compression)", "Unioning elements directly instead of their roots"]
+  },
+  {
+    "id": "dp-knapsack-01",
+    "name": "0/1 Knapsack Dynamic Programming",
+    "category": "Dynamic Programming",
+    "difficulty_bracket": "1200-1700",
+    "core_invariant": "For each item, either take it or leave it once. State dp[w] stores max value with weight capacity w. Iterate capacity in reverse to prevent duplicate usage.",
+    "time_complexity": "O(N * W)",
+    "space_complexity": "O(W) with 1D rolling array",
+    "problem_signatures": [
+      "Partition Equal Subset Sum",
+      "Target Sum, Ones and Zeroes",
+      "Maximize value within constrained weight where items used at most once"
+    ],
+    "hints": {
+      "tier1_intuition": "Every item is a binary decision: include or exclude. A subproblem is defined by (item_index, remaining_capacity).",
+      "tier2_pattern": "0/1 Knapsack: `dp[w] = max(dp[w], dp[w - weight[i]] + value[i])`. Must loop `w` downwards from `W` down to `weight[i]`.",
+      "tier3_invariant": "Looping downwards guarantees `dp[w - weight[i]]` represents the state from previous items, ensuring no item is reused.",
+      "tier4_edge_cases": "Target sum with negatives (shift offset by sum), capacity W is very large (W > 10^9 requires meet-in-the-middle or branch-and-bound)."
+    },
+    "template": "dp = [0] * (capacity + 1)\nfor weight, value in items:\n    for w in range(capacity, weight - 1, -1):\n        dp[w] = max(dp[w], dp[w - weight] + value)\nreturn dp[capacity]",
+    "common_traps": ["Iterating forwards (0 to W) which transforms 0/1 Knapsack into Unbounded Knapsack", "Off-by-one capacity index bounds"]
+  },
+  {
+    "id": "dp-longest-increasing-subsequence",
+    "name": "Longest Increasing Subsequence (Patience Sorting O(N log N))",
+    "category": "Dynamic Programming",
+    "difficulty_bracket": "1300-1800",
+    "core_invariant": "tails[k] holds the smallest tail of all increasing subsequences of length k+1 found so far. tails is strictly increasing, allowing binary search.",
+    "time_complexity": "O(N log N)",
+    "space_complexity": "O(N)",
+    "problem_signatures": [
+      "Longest Increasing Subsequence",
+      "Russian Doll Envelopes",
+      "Minimum deletions/insertions to make array sorted"
+    ],
+    "hints": {
+      "tier1_intuition": "To make increasing subsequences as extendable as possible, you always prefer candidates with the smallest possible ending values.",
+      "tier2_pattern": "Patience Sorting / Binary Search: maintain `tails` array. For each number, use `bisect_left` to find its replacement position.",
+      "tier3_invariant": "If `x` is greater than all elements in `tails`, append `x`. Otherwise, replace the first element `>= x` with `x` to optimize future extensions.",
+      "tier4_edge_cases": "Strictly increasing (`bisect_left`) vs non-decreasing (`bisect_right`), duplicate values."
+    },
+    "template": "from bisect import bisect_left\ntails = []\nfor x in nums:\n    idx = bisect_left(tails, x)\n    if idx == len(tails):\n        tails.append(x)\n    else:\n        tails[idx] = x\nreturn len(tails)",
+    "common_traps": ["Using O(N^2) DP when N >= 10^5 causing TLE", "Mixing up `bisect_left` and `bisect_right` for strictly increasing"]
+  },
+  {
+    "id": "segment-tree-point-update",
+    "name": "Segment Tree (Point Update & Range Query)",
+    "category": "Data Structures",
+    "difficulty_bracket": "1500-2100",
+    "core_invariant": "Binary tree where each node represents an associative aggregate (sum, min, max, gcd) over interval [L, R]. Any range query decomposes into at most 2 * log N nodes.",
+    "time_complexity": "O(log N) per query and update; O(N) build",
+    "space_complexity": "O(4N) array size",
+    "problem_signatures": [
+      "Dynamic range minimum/maximum/sum query with updates",
+      "Inversion count with coordinate compression",
+      "Range GCD, Range Bitwise OR with point updates"
+    ],
+    "hints": {
+      "tier1_intuition": "Prefix sums only work when the array is static. When elements are updated in real time, build a hierarchical tournament tree to balance query and update in O(log N).",
+      "tier2_pattern": "Segment Tree: recursive tree with `build`, `update(idx, val)`, `query(ql, qr)`. Node children are `2*node` and `2*node+1`.",
+      "tier3_invariant": "The aggregation operation must be associative: `op(op(a, b), c) == op(a, op(b, c))`.",
+      "tier4_edge_cases": "Array bounds 0-indexed vs 1-indexed, allocating 4*N storage, identity element (0 for sum, infinity for min, 0 for gcd)."
+    },
+    "template": "class SegTree:\n    def __init__(self, arr):\n        self.n = len(arr)\n        self.tree = [0] * (4 * self.n)\n        self.build(arr, 1, 0, self.n - 1)\n    def build(self, arr, node, l, r):\n        if l == r: self.tree[node] = arr[l]; return\n        mid = (l + r) // 2\n        self.build(arr, 2*node, l, mid)\n        self.build(arr, 2*node+1, mid+1, r)\n        self.tree[node] = self.tree[2*node] + self.tree[2*node+1]\n    def query(self, node, l, r, ql, qr):\n        if ql <= l and r <= qr: return self.tree[node]\n        if r < ql or l > qr: return 0\n        mid = (l + r) // 2\n        return self.query(2*node, l, mid, ql, qr) + self.query(2*node+1, mid+1, r, ql, qr)",
+    "common_traps": ["Allocating 2*N instead of 4*N resulting in out of bounds error", "Query interval non-overlapping base case returning incorrect identity element"]
+  },
+  {
+    "id": "fenwick-tree-bit",
+    "name": "Fenwick Tree (Binary Indexed Tree)",
+    "category": "Data Structures",
+    "difficulty_bracket": "1400-1900",
+    "core_invariant": "Index i stores sum of range of length (i & -i). Uses least significant set bit (LSB) to traverse powers of two.",
+    "time_complexity": "O(log N) update and prefix query; O(N) space",
+    "space_complexity": "O(N) space (extremely cache friendly & concise)",
+    "problem_signatures": [
+      "Range sum query with point updates",
+      "Inversion counting in array",
+      "Count elements smaller than self to the right"
+    ],
+    "hints": {
+      "tier1_intuition": "Every positive integer can be uniquely partitioned into powers of 2. Fenwick Tree stores sub-aggregates using the LSB isolate `i & -i`.",
+      "tier2_pattern": "BIT: 1-indexed array. `update(i, delta)` adds `delta` and advances `i += (i & -i)`. `query(i)` accumulates and decrements `i -= (i & -i)`.",
+      "tier3_invariant": "`query(R) - query(L - 1)` calculates exact range sum `sum(L...R)` in 2 * log N steps.",
+      "tier4_edge_cases": "Strictly 1-indexed (0 causes infinite loop with `0 & -0 == 0`), coordinate compression needed when value range > 10^6."
+    },
+    "template": "class FenwickTree:\n    def __init__(self, n):\n        self.n = n\n        self.tree = [0] * (n + 1)\n    def update(self, i, delta):\n        while i <= self.n:\n            self.tree[i] += delta\n            i += i & -i\n    def query(self, i):\n        s = 0\n        while i > 0:\n            s += self.tree[i]\n            i -= i & -i\n        return s",
+    "common_traps": ["Attempting to query or update index 0 (infinite loop)", "Not using coordinate compression when counting inversions on large numbers"]
+  },
+  {
+    "id": "trie-bitwise-xor",
+    "name": "Bitwise XOR Trie (Maximum XOR Pair)",
+    "category": "Bit Manipulation & Trees",
+    "difficulty_bracket": "1500-2000",
+    "core_invariant": "Insert 31-bit binary representations into a 0-1 Trie. To maximize XOR with X, greedily branch toward the opposite bit (1 - bit) if it exists.",
+    "time_complexity": "O(N * 30)",
+    "space_complexity": "O(N * 30)",
+    "problem_signatures": [
+      "Maximum XOR of Two Numbers in an Array",
+      "Maximum XOR Subarray (using prefix XOR)",
+      "Queries asking for maximum bitwise XOR against a set"
+    ],
+    "hints": {
+      "tier1_intuition": "Because most significant bits dominate all lower bits combined (2^k > 2^(k-1) + ... + 1), greedily matching the opposite bit at the highest position always yields the maximum possible result.",
+      "tier2_pattern": "Binary Trie: each node has two children: `0` and `1`. Insert numbers bit-by-bit from bit 31 down to 0.",
+      "tier3_invariant": "At bit `b`, check if child `1 - current_bit` exists. If so, take it and set bit `b` in answer; otherwise take `current_bit`.",
+      "tier4_edge_cases": "Number of bits (30 for positive 32-bit integers, 60 for 64-bit integers), empty array."
+    },
+    "template": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n\nroot = TrieNode()\nfor num in nums:\n    curr = root\n    for bit in range(30, -1, -1):\n        b = (num >> bit) & 1\n        if b not in curr.children:\n            curr.children[b] = TrieNode()\n        curr = curr.children[b]",
+    "common_traps": ["Starting bit iteration from 32 instead of 30/31", "Forgetting prefix XOR identity: `xor(i...j) = pref[j] ^ pref[i-1]`"]
+  },
+  {
+    "id": "number-theory-modular-inverse",
+    "name": "Modular Arithmetic & Fermat's Little Theorem",
+    "category": "Math & Combinatorics",
+    "difficulty_bracket": "1300-1800",
+    "core_invariant": "For prime modulus P: a^(P-1) ≡ 1 (mod P). Therefore, a^(P-2) is the modular multiplicative inverse of a mod P.",
+    "time_complexity": "O(log P) per inverse; O(N) precomputation for factorials",
+    "space_complexity": "O(N) for factorial tables",
+    "problem_signatures": [
+      "Calculating combinations nCr modulo 10^9 + 7 or 998244353",
+      "Division in modular arithmetic",
+      "Paths on grid with obstacles modulo 10^9 + 7"
+    ],
+    "hints": {
+      "tier1_intuition": "Division is not defined directly under modulo arithmetic. You must multiply by the modular multiplicative inverse.",
+      "tier2_pattern": "Use Fermat's Little Theorem: `inv(a) = pow(a, MOD - 2, MOD)` when MOD is prime.",
+      "tier3_invariant": "Precompute `fact[i]` and `inv_fact[i]` in O(N) time so any `nCr` can be evaluated in O(1).",
+      "tier4_edge_cases": "Modulus must be prime (if not prime, use Extended Euclidean Algorithm), n < r returns 0."
+    },
+    "template": "MOD = 10**9 + 7\nMAX = 200000\nfact = [1] * (MAX + 1)\ninv = [1] * (MAX + 1)\nfor i in range(1, MAX + 1):\n    fact[i] = (fact[i - 1] * i) % MOD\ninv[MAX] = pow(fact[MAX], MOD - 2, MOD)\nfor i in range(MAX - 1, -1, -1):\n    inv[i] = (inv[i + 1] * (i + 1)) % MOD\n\ndef nCr(n, r):\n    if r < 0 or r > n: return 0\n    return fact[n] * inv[r] % MOD * inv[n - r] % MOD",
+    "common_traps": ["Attempting `pow(a, MOD-2)` when MOD is not prime", "Negative results in intermediate modulo operations (always do `(val % MOD + MOD) % MOD`)"]
+  }
+]
