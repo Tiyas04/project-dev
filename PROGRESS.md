@@ -19,6 +19,7 @@ DevArena is an AI-powered Competitive Programming Analytics Platform that helps 
 | Phase 7 — Public Profiles & Achievements | ✅ Complete     | 100%       |
 | Phase 8 — AI Features                    | ✅ Complete     | 100%       |
 | Phase 9 — Background Jobs & Automation   | ✅ Complete     | 100%       |
+| Phase 10 — Python AI & RAG Engine        | ✅ Complete     | 100%       |
 
 ---
 
@@ -289,6 +290,45 @@ Implemented achievement visualizations:
 
 ---
 
+## Phase 10 — Python AI & RAG Engine ✅
+
+### Completed Features
+
+* [x] **Python FastAPI RAG Microservice (`ai-service/`)**:
+  * High-performance asynchronous FastAPI & Uvicorn service running on port 8000.
+  * Endpoints: `/health`, `/api/rag/coach`, `/api/rag/hints`, `/api/rag/plan`, `/api/rag/review`, `/api/rag/patterns`, `/api/rag/problems`.
+  * Multi-model resilience loop prioritizing `gemini-3.8-flash` -> `gemini-3.5-flash` -> `gemini-3.1-pro-preview` -> `gemini-2.5-flash`.
+  * Secure internal communication with Express via `x-ai-secret` and `INTERNAL_AI_SECRET`.
+  * Microservice runner script (`run.py`), virtual environment management via `uv`, and production `Dockerfile`.
+
+* [x] **Curated Knowledge Base & Vector Indexing**:
+  * Curated DSA algorithmic patterns corpus (`app/data/dsa_patterns.json`) covering Dynamic Programming, Segment Trees, Fenwick Trees, Shortest Paths, Topological Sort, DSU, Monotonic Stack, Sliding Window, Two Pointers, Bitwise XOR Trie, and Number Theory.
+  * Curated Problem Corpus (`app/data/problem_corpus.json`) across LeetCode, Codeforces, and CSES with ratings, tags, and progressive hints.
+  * Pure NumPy dense vector index (`app/rag/vector_store.py`) with cosine similarity and BM25 keyword matching (hybrid search).
+  * Embeddings engine (`app/rag/embeddings.py`) with Google GenAI `text-embedding-004` and deterministic local dense projection fallback.
+
+* [x] **Context-Aware Retrieval & Generation Chains**:
+  * Context retriever (`app/rag/retriever.py`) ingesting user ratings (LeetCode, Codeforces, Arena Score) and matching target difficulty frontier.
+  * RAG Coach Chain (`app/rag/chains.py`): Grounded, spoiler-free algorithmic coaching citing actual indexed patterns and complexity benchmarks.
+  * Progressive 4-Tier Hint System: Unlocks conceptual intuition -> pattern recommendation -> mathematical invariant -> constraints & corner cases.
+  * Curated Study Planner: Generates 3-week milestone roadmaps populated with real indexed practice problems.
+  * Contest Post-Mortem Diagnostics: Diagnoses submission failures (TLE, WA, MLE) and prescribes targeted recovery drills.
+
+* [x] **Express Backend Integration & Resilience**:
+  * Express RAG Client Service (`backend/src/services/rag.service.js`) with health monitoring and endpoint dispatch.
+  * Controller enhancements (`backend/src/controllers/ai.controller.js`) with automatic fallback to direct in-process Gemini if Python microservice is offline.
+  * New REST API endpoints: `/api/v1/ai/status`, `/api/v1/ai/hints`, `/api/v1/ai/plan`, `/api/v1/ai/review`, `/api/v1/ai/patterns`, `/api/v1/ai/problems`.
+
+* [x] **Frontend Modernization**:
+  * Upgraded AI Coach page (`frontend/src/app/(authenticated)/ai-coach/page.tsx`) with 4 interactive tabs:
+    1. 💬 **AI Coach Chat** (with Grounded RAG badges and pattern pills)
+    2. 💡 **4-Tier Progressive Hints** (interactive spoiler-shielded progressive reveal)
+    3. 🗺️ **Curated Study Planner** (topic selection, rating targets, and indexed problem cards)
+    4. 🩺 **Contest Diagnostics** (symptom picker and recovery drills)
+  * Real-time RAG service health badge in header.
+
+---
+
 # Architecture Summary
 
 Frontend
@@ -299,7 +339,7 @@ Next.js 16 (App Router)
 ├── Dashboard (KPIs, Charts, Badges, Background Queue trigger)
 ├── Analytics (Radar topic analysis, solve breakdowns)
 ├── Leaderboard (Global & Friends rankings with Redis caching)
-├── AI Coach (Roadmaps & Chat)
+├── AI Coach & RAG Hub (Chat, 4-Tier Hints, Study Planner, Diagnostics)
 ├── Public Profiles (Coder ID card, Achievements, Activity feed)
 └── Authentication
 ```
@@ -307,14 +347,26 @@ Next.js 16 (App Router)
 Backend
 
 ```text
-Express.js + Node.js
+Express.js + Node.js (API Gateway & Core Logic)
 │
 ├── Cache Controller (Redis / Upstash / In-memory fallback)
 ├── Background Queue Manager (BullMQ: DataSync, Analytics, Achievements, Crons)
 ├── Platform Fetchers (LeetCode, Codeforces, GitHub)
 ├── Achievement Engine (22 Automated Rules)
 ├── Auth, User, Accounts, Social & Leaderboard Modules
-└── AI Module (Gemini with load-spike fallback)
+└── AI Router & RAG Proxy (Connecting to Python Microservice with local fallback)
+```
+
+AI & RAG Microservice (Phase 10)
+
+```text
+Python 3.12+ / FastAPI & Uvicorn (Port 8000)
+│
+├── Vector Store (Pure NumPy Dense Vector Store + BM25 Hybrid Search)
+├── Embedding Engine (Google GenAI text-embedding-004 + Local Dense Projection)
+├── Curated DSA Knowledge Base (14 Core Patterns, 12 Graded Problems)
+├── Context-Aware Retrieval (User Rating Frontier, Weakness Ingestion)
+└── RAG Generation Chains (AI Coach, 4-Tier Hints, Study Planner, Contest Review)
 ```
 
 Database & Caching
@@ -332,4 +384,5 @@ MongoDB Atlas + Redis (Upstash / Local)
 
 # Milestone Completion
 
-🎉 **Phase 9 (Background Jobs & Cache Controlling) is 100% complete!** DevArena is now fully equipped with asynchronous job queues, automated platform sync sweeps, unified achievement verification, and low-latency Redis caching.
+🎉 **Phase 10 (Python AI & RAG Engine) is 100% complete!** DevArena is now fully armed with a dedicated FastAPI microservice, hybrid vector retrieval, progressive 4-tier problem hints, dynamic study planners, and post-mortem contest diagnostics. All 10 phases of the core roadmap are complete!
+

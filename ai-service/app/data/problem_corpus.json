@@ -1,0 +1,218 @@
+[
+  {
+    "id": "lc-3",
+    "title": "Longest Substring Without Repeating Characters",
+    "platform": "LeetCode",
+    "slug": "longest-substring-without-repeating-characters",
+    "external_id": "3",
+    "rating": 1200,
+    "difficulty": "Medium",
+    "topic_tags": ["Strings", "Sliding Window", "Hash Map"],
+    "pattern_id": "sliding-window-dynamic",
+    "editorial_summary": "Use a dynamic sliding window tracking the most recent index of each character to expand right and jump left forward.",
+    "hints": {
+      "tier1": "Notice that any duplicate character invalidates the current substring. We only need to check if the next character has already appeared in the active window.",
+      "tier2": "Dynamic Sliding Window with Hash Map: maintain left pointer and map of `char -> last_seen_index`.",
+      "tier3": "If `s[right]` is in the map and `last_seen[s[right]] >= left`, jump `left = last_seen[s[right]] + 1`.",
+      "tier4": "Edge case: empty string `\"\"` returns 0; string with all unique characters; string with all identical characters."
+    }
+  },
+  {
+    "id": "lc-560",
+    "title": "Subarray Sum Equals K",
+    "platform": "LeetCode",
+    "slug": "subarray-sum-equals-k",
+    "external_id": "560",
+    "rating": 1400,
+    "difficulty": "Medium",
+    "topic_tags": ["Arrays", "Prefix Sums", "Hash Map"],
+    "pattern_id": "prefix-sums-and-hashmap",
+    "editorial_summary": "Store prefix sum frequencies in a map. Subarray (i...j) equals K when prefix[j] - prefix[i] == K.",
+    "hints": {
+      "tier1": "Since numbers can be negative, standard sliding window does not work because prefix sums are non-monotonic.",
+      "tier2": "Transform the problem into Prefix Sums: sum(i...j) = prefix[j] - prefix[i-1]. If this equals K, then prefix[i-1] = prefix[j] - K.",
+      "tier3": "Maintain a hash map of running prefix sum counts. At each index, add `counts.get(curr_sum - k, 0)` to the total answer.",
+      "tier4": "Crucial: initialize `counts = {0: 1}` so that subarrays starting exactly at index 0 are counted."
+    }
+  },
+  {
+    "id": "lc-875",
+    "title": "Koko Eating Bananas",
+    "platform": "LeetCode",
+    "slug": "koko-eating-bananas",
+    "external_id": "875",
+    "rating": 1300,
+    "difficulty": "Medium",
+    "topic_tags": ["Binary Search", "Arrays"],
+    "pattern_id": "binary-search-monotonic-answer",
+    "editorial_summary": "Binary search on eating speed K in range [1, max(piles)]. Feasibility check computes hours required in O(N).",
+    "hints": {
+      "tier1": "If Koko can finish with speed K, she can definitely finish with any speed > K. The answer space has a strict monotonic boundary.",
+      "tier2": "Binary Search on Answer Space: range is `[1, max(piles)]`.",
+      "tier3": "Predicate `can_eat(speed)`: sum of `ceil(pile / speed)` across all piles. If `hours <= h`, feasibility is True.",
+      "tier4": "Ceil division without floats: `(pile + speed - 1) // speed` to avoid precision issues."
+    }
+  },
+  {
+    "id": "lc-739",
+    "title": "Daily Temperatures",
+    "platform": "LeetCode",
+    "slug": "daily-temperatures",
+    "external_id": "739",
+    "rating": 1250,
+    "difficulty": "Medium",
+    "topic_tags": ["Stack", "Monotonic Stack", "Arrays"],
+    "pattern_id": "monotonic-stack-nge",
+    "editorial_summary": "Maintain a monotonic decreasing stack of indices. Pop when current temperature is strictly higher than stack top.",
+    "hints": {
+      "tier1": "For each day, you need the nearest future day that is strictly warmer. Brute force is O(N^2), but earlier colder days are resolved by warmer days.",
+      "tier2": "Monotonic Decreasing Stack storing day indices.",
+      "tier3": "While `temperatures[i] > temperatures[stack[-1]]`, pop index `prev` and set `ans[prev] = i - prev`.",
+      "tier4": "Indices left in stack at the end have no warmer future day, so default answer is 0."
+    }
+  },
+  {
+    "id": "lc-743",
+    "title": "Network Delay Time",
+    "platform": "LeetCode",
+    "slug": "network-delay-time",
+    "external_id": "743",
+    "rating": 1450,
+    "difficulty": "Medium",
+    "topic_tags": ["Graph Theory", "Shortest Path", "Heap"],
+    "pattern_id": "shortest-path-dijkstra",
+    "editorial_summary": "Standard Dijkstra from starting node K. Answer is max(dist) across all nodes if all are reachable, else -1.",
+    "hints": {
+      "tier1": "Signal travels simultaneously along all wires. The time when all nodes receive the signal is the maximum of the shortest times from K to each node.",
+      "tier2": "Dijkstra's shortest path with Min-Heap `(time, node)`.",
+      "tier3": "Maintain `dist` initialized to infinity. Discard stale entries when `d > dist[u]`.",
+      "tier4": "If any node remains unreachable (`dist[i] == inf`), return -1; 1-indexed node IDs."
+    }
+  },
+  {
+    "id": "lc-207",
+    "title": "Course Schedule",
+    "platform": "LeetCode",
+    "slug": "course-schedule",
+    "external_id": "207",
+    "rating": 1350,
+    "difficulty": "Medium",
+    "topic_tags": ["Graph Theory", "Topological Sort", "BFS"],
+    "pattern_id": "topological-sort-kahn",
+    "editorial_summary": "Determine if directed dependency graph has cycles using Kahn's algorithm or 3-color DFS.",
+    "hints": {
+      "tier1": "Taking course A requires course B. Can all courses be finished? This is equivalent to asking: is the directed graph acyclic (a DAG)?",
+      "tier2": "Kahn's Algorithm (BFS with In-Degrees).",
+      "tier3": "Calculate in-degrees. Enqueue all nodes with in-degree 0. As you process, decrement in-degree of neighbors. Count how many courses were processed.",
+      "tier4": "If processed count equals total numCourses, return True; otherwise False (cycle present)."
+    }
+  },
+  {
+    "id": "cf-1365D",
+    "title": "Solve The Maze",
+    "platform": "Codeforces",
+    "slug": "1365-d-solve-the-maze",
+    "external_id": "1365D",
+    "rating": 1400,
+    "difficulty": "Medium",
+    "topic_tags": ["Graph Theory", "BFS", "Greedy"],
+    "pattern_id": "shortest-path-dijkstra",
+    "editorial_summary": "Greedily block all neighbors of bad people with walls. Then run BFS from exit (n,m) to check reachability of good people.",
+    "hints": {
+      "tier1": "Instead of checking each person separately, block the Bad people by surrounding them immediately with walls.",
+      "tier2": "Greedy + Reverse BFS from exit `(n, m)`.",
+      "tier3": "If any Good person is adjacent to a Bad person, it's impossible. Block all 4 adjacent cells of every Bad person. Then run BFS backwards from the exit.",
+      "tier4": "Verify that no Bad person can reach the exit, and all Good people can reach the exit."
+    }
+  },
+  {
+    "id": "cf-455A",
+    "title": "Boredom",
+    "platform": "Codeforces",
+    "slug": "455-a-boredom",
+    "external_id": "455A",
+    "rating": 1500,
+    "difficulty": "Medium",
+    "topic_tags": ["Dynamic Programming"],
+    "pattern_id": "dp-knapsack-01",
+    "editorial_summary": "Aggregate counts into count[x]. If you pick x, you gain x*count[x] points but cannot pick x-1. Equivalent to House Robber.",
+    "hints": {
+      "tier1": "Picking element X deletes all occurrences of X-1 and X+1. But picking X lets you take ALL occurrences of X for free!",
+      "tier2": "Dynamic Programming similar to House Robber: reduce the problem to frequency array `count[x]`.",
+      "tier3": "`dp[x] = max(dp[x-1], dp[x-2] + x * count[x])`.",
+      "tier4": "Array values up to 10^5, answer can exceed 32-bit integer (use 64-bit int / long long in C++)."
+    }
+  },
+  {
+    "id": "cses-1640",
+    "title": "Sum of Two Values",
+    "platform": "CSES",
+    "slug": "cses-sum-of-two-values",
+    "external_id": "1640",
+    "rating": 1000,
+    "difficulty": "Easy",
+    "topic_tags": ["Two Pointers", "Sorting", "Hash Map"],
+    "pattern_id": "two-pointers-opposite",
+    "editorial_summary": "Find two array elements with sum equal to target X. Return 1-based indices.",
+    "hints": {
+      "tier1": "Sort pairs `(value, original_index)` or use a hash map `val -> index`.",
+      "tier2": "Two Pointers on sorted array or Hash Map lookup.",
+      "tier3": "If sorted: `left = 0, right = n-1`. If `sum < X`, `left++`; if `sum > X`, `right--`.",
+      "tier4": "1-based indexing required by CSES; output 'IMPOSSIBLE' if no pair exists."
+    }
+  },
+  {
+    "id": "lc-300",
+    "title": "Longest Increasing Subsequence",
+    "platform": "LeetCode",
+    "slug": "longest-increasing-subsequence",
+    "external_id": "300",
+    "rating": 1400,
+    "difficulty": "Medium",
+    "topic_tags": ["Dynamic Programming", "Binary Search"],
+    "pattern_id": "dp-longest-increasing-subsequence",
+    "editorial_summary": "Maintain smallest ending tails with binary search in O(N log N).",
+    "hints": {
+      "tier1": "O(N^2) DP is simple with `dp[i] = max(dp[j] + 1)`. But can we do better? At any length K, what is the best ending element to keep?",
+      "tier2": "Patience Sorting / Binary Search (tails array).",
+      "tier3": "Maintain `tails` where `tails[i]` is the smallest tail of all increasing subsequences of length `i+1`. Use `bisect_left`.",
+      "tier4": "Duplicate values: strictly increasing requires `bisect_left` to overwrite equal values."
+    }
+  },
+  {
+    "id": "lc-307",
+    "title": "Range Sum Query - Mutable",
+    "platform": "LeetCode",
+    "slug": "range-sum-query-mutable",
+    "external_id": "307",
+    "rating": 1600,
+    "difficulty": "Medium",
+    "topic_tags": ["Segment Tree", "Binary Indexed Tree", "Design"],
+    "pattern_id": "fenwick-tree-bit",
+    "editorial_summary": "Implement mutable range sum queries in O(log N) using a Fenwick Tree or Segment Tree.",
+    "hints": {
+      "tier1": "Regular array has O(1) update and O(N) query. Prefix sums have O(N) update and O(1) query. A balanced structure gives O(log N) for both.",
+      "tier2": "Binary Indexed Tree (Fenwick) or Segment Tree.",
+      "tier3": "Fenwick Tree with 1-based indexing using `i += (i & -i)` for updates and `i -= (i & -i)` for prefix sums.",
+      "tier4": "Updating an element: pass delta `new_val - old_val` to `bit.update(idx, delta)`."
+    }
+  },
+  {
+    "id": "lc-421",
+    "title": "Maximum XOR of Two Numbers in an Array",
+    "platform": "LeetCode",
+    "slug": "maximum-xor-of-two-numbers-in-an-array",
+    "external_id": "421",
+    "rating": 1700,
+    "difficulty": "Medium",
+    "topic_tags": ["Trie", "Bit Manipulation"],
+    "pattern_id": "trie-bitwise-xor",
+    "editorial_summary": "Insert numbers into a 0-1 Trie. For each number, greedily choose opposite bit from MSB to LSB.",
+    "hints": {
+      "tier1": "To maximize bitwise XOR, you want the highest bits (MSB) to be 1 as much as possible.",
+      "tier2": "0-1 Bitwise Trie.",
+      "tier3": "For each bit from 31 down to 0, check if child `1 - current_bit` exists. If yes, add `1 << bit` to the answer and traverse that branch.",
+      "tier4": "Prefix set approach can also be used in O(32 * N)."
+    }
+  }
+]

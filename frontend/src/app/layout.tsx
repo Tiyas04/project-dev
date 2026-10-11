@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cabin_Sketch, Space_Mono } from "next/font/google";
 import "./globals.css";
+import "katex/dist/katex.min.css";
 import { Background } from "@/components/background";
 import { Providers } from "@/app/providers";
 

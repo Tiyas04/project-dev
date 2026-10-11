@@ -4,13 +4,21 @@
   "private": true,
   "description": "DevArena - AI-Powered Competitive Programming Analytics Platform",
   "scripts": {
-    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue.bold,magenta.bold\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev": "concurrently -n \"BACKEND,FRONTEND,AI_RAG\" -c \"blue.bold,magenta.bold,green.bold\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\" \"python ai-service/run.py\"",
     "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm run dev --prefix frontend",
+    "dev:ai": "python ai-service/run.py",
+    "dev:ai:venv": ".\\ai-service\\.venv\\Scripts\\python ai-service/run.py",
     "install:all": "npm install --prefix backend && npm install --prefix frontend",
-    "build": "npm run build --prefix frontend"
+    "build": "npm run build --prefix frontend",
+    "check:frontend": "npm run typecheck --prefix frontend",
+    "check:backend": "node --check backend/src/index.js",
+    "check:ai": "python -m py_compile ai-service/run.py ai-service/app/main.py",
+    "check:all": "npm run check:backend && npm run check:frontend && npm run check:ai",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "husky": "^9.1.7"
   }
 }
